@@ -11,6 +11,10 @@
 *.la
 *.a
 
+# Temporary files
+*.swp
+*~
+
 # Build directories
 build/
 bin/

@@ -17,6 +17,7 @@ target_link_libraries(
 	luola2
 	${Boost_LIBRARIES}
 	${GLFW_LIBRARIES}
+	${GLEW_LIBRARY}
 	${MINIZIP_LIBRARIES}
 )
 

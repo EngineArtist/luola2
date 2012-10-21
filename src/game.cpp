@@ -5,6 +5,7 @@
 
 #include "fs/datafile.h"
 #include "res/shader.h"
+#include "res/loader.h"
 #include "game.h"
 
 void gameloop()
@@ -15,6 +16,7 @@ void gameloop()
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
+    ProgramResource *program;
     {
         DataFile df("test.shaders");
         if(df.isError()) {
@@ -22,14 +24,10 @@ void gameloop()
             return;
         }
 
-        if(!(ProgramResource::make("program")
-            (ShaderResource::load("vertex", df, "vertex.shader", Resource::VERTEX_SHADER))
-            (ShaderResource::load("fragment", df, "fragment.shader", Resource::FRAGMENT_SHADER))
-            .link()))
-            return;
+        ResourceLoader rl(df, "sample.res");
+        program = static_cast<ProgramResource*>(rl.load("program"));
     }
 
-    ProgramResource *program = static_cast<ProgramResource*>(Resources::get().getResource("program"));
 
     static const GLfloat g_vertex_buffer_data[] = {
         -1.0f, -1.0f, 0.0f,

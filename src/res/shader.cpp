@@ -74,12 +74,12 @@ ShaderResource::~ShaderResource()
     glDeleteShader(m_id);
 }
 
-ProgramResource &ProgramResource::make(const string& name)
+ProgramResource *ProgramResource::make(const string& name)
 {
     GLuint id = glCreateProgram();
     ProgramResource *res = new ProgramResource(name, id);
     Resources::get().registerResource(res);
-    return *res;
+    return res;
 }
 
 ProgramResource::ProgramResource(const string& name, GLuint id)
@@ -87,14 +87,13 @@ ProgramResource::ProgramResource(const string& name, GLuint id)
 {
 }
 
-ProgramResource &ProgramResource::operator()(ShaderResource *shader)
+void ProgramResource::addShader(ShaderResource *shader)
 {
     assert(shader);
     if(shader) {
         glAttachShader(m_id, shader->id());
         addDependency(shader);
     }
-    return *this;
 }
 
 bool ProgramResource::link()

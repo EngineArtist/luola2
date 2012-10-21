@@ -41,14 +41,14 @@ public:
      * Create a new program.
      * To finalize, you must add shaders to this program and finally call link().
      */
-    static ProgramResource &make(const string& name);
+    static ProgramResource *make(const string& name);
 
     /**
      * Add a shader to this program.
      * @param shader shader to add
      * @return reference to this
      */
-    ProgramResource &operator()(ShaderResource *shader);
+    void addShader(ShaderResource *shader);
 
     /**
      * Link the program.

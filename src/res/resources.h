@@ -29,6 +29,13 @@ public:
     Type type() const { return m_type; }
 
     /**
+     * Is this a shader type resource
+     *
+     * @return true if resource type is one of the _SHADERs
+     */
+    bool isShader() const;
+
+    /**
      * Get the name of the resource
      *
      * @return resource name

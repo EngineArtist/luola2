@@ -50,25 +50,28 @@ class DataFileImpl {
 //! A data source that wraps a file
 class DataSourceFile : public DataSourceImpl {
     public:
-        DataSourceFile(const string& path)
-            : in_(path, std::ifstream::in)
+        DataSourceFile(const fs::path& path)
+            : in_(path.native(), std::ifstream::in)
         {
         }
 
         bool isError() const
         {
-            return !in_.fail();
+            return !error_.empty();
         }
 
         string errorString() const
         {
-            return "file read error";
+            return error_;
         }
 
         std::streamsize read(char *s, std::streamsize n)
         {
             in_.read(s, n);
-            if(in_.eof()) {
+            if(in_.bad()) {
+                error_ = "read error";
+                return -1;
+            } else if(in_.eof()) {
                 std::streamsize count = in_.gcount();
                 if(count==0)
                     return -1;
@@ -79,6 +82,7 @@ class DataSourceFile : public DataSourceImpl {
 
     private:
         std::ifstream in_;
+        string error_;
 };
 
 static string zipErrorToString(int error)
@@ -163,14 +167,14 @@ class DataSourceZip : public DataSourceImpl {
 //! Directory based data file implementation
 class DataFileDir : public DataFileImpl {
     public:
-        DataFileDir(const string& path)
+        DataFileDir(const fs::path& path)
             : path_(path)
         {
         }
 
         DataSourceImpl *getSource(const string& resource)
         {
-            return new DataSourceFile(path_ + "/" + resource);
+            return new DataSourceFile(path_ / resource);
         }
 
         bool isError() const
@@ -184,13 +188,13 @@ class DataFileDir : public DataFileImpl {
         }
 
     private:
-        string path_;
+        fs::path path_;
 };
 
 //! ZIP file based data file implementation
 class DataFileZip : public DataFileImpl {
     public:
-        DataFileZip(const string& path)
+        DataFileZip(const fs::path& path)
             : path_(path), error_(0)
         {
             zip_ = unzOpen(path.c_str());
@@ -221,7 +225,7 @@ class DataFileZip : public DataFileImpl {
         bool inuse;
 
     private:
-        string path_;
+        fs::path path_;
         unzFile zip_;
         int error_;
 };
@@ -231,9 +235,9 @@ DataFile::DataFile(const string& name)
     fs::path path = Paths::get().findDataFile(name);
     if(fs::exists(path)) {
         if(is_directory(path)) {
-            p_ = shared_ptr<DataFileImpl>(new DataFileDir(name));
+            p_ = shared_ptr<DataFileImpl>(new DataFileDir(path));
         } else {
-            p_ = shared_ptr<DataFileImpl>(new DataFileZip(name));
+            p_ = shared_ptr<DataFileImpl>(new DataFileZip(path));
         }
     } 
 }

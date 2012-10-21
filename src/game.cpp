@@ -1,6 +1,10 @@
+#include <iostream>
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
+#include "fs/datafile.h"
+#include "res/shader.h"
 #include "game.h"
 
 void gameloop()
@@ -10,6 +14,22 @@ void gameloop()
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
+
+    {
+        DataFile df("test.shaders");
+        if(df.isError()) {
+            std::cerr << df.errorString() << "\n";
+            return;
+        }
+
+        if(!(ProgramResource::make("program")
+            (ShaderResource::load("vertex", df, "vertex.shader", Resource::VERTEX_SHADER))
+            (ShaderResource::load("fragment", df, "fragment.shader", Resource::FRAGMENT_SHADER))
+            .link()))
+            return;
+    }
+
+    ProgramResource *program = static_cast<ProgramResource*>(Resources::get().getResource("program"));
 
     static const GLfloat g_vertex_buffer_data[] = {
         -1.0f, -1.0f, 0.0f,
@@ -24,6 +44,8 @@ void gameloop()
 
     do {
         glClear( GL_COLOR_BUFFER_BIT );
+
+        glUseProgram(program->id());
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -43,6 +65,8 @@ void gameloop()
         glfwSwapBuffers();
 
     } while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
+
+    Resources::get().unloadResource("program");
 
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteVertexArrays(1, &VertexArrayID);

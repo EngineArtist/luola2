@@ -32,7 +32,7 @@ else()
 endif()
 
 # Libraries
-find_package(Boost COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options thread REQUIRED)
 find_package(GLFW REQUIRED)
 find_package(MiniZip REQUIRED)
 

@@ -44,8 +44,10 @@ class ThreadPool {
          * Initialize the singleton pool.
          * The pool will contain at least two threads, or more
          * if more processors are available.
+		 *
+		 * @param threads number of threads. If zero or below, the number is determined automatically.
          */
-        static void initSingleton();
+        static void initSingleton(int threads=0);
 
         /**
          * Enqueue a task to be executed on the Singleton pool.

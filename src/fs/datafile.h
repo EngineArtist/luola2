@@ -58,11 +58,7 @@ typedef boost::iostreams::stream<DataSource> DataStream;
  * - Directories
  * - Zip files
  *
- * The following locations will be searched for the data file:
- * TODO: not implemented yet.
- *
- * - Home (e.g. ~/.luola2/)
- * - System (e.g. /usr/local/share/luola2/)
+ * Path::findDataFile is used to find the data file or directory.
  *
  * Call `isError()` after opening to see if the archive was
  * opened properly.

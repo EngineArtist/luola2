@@ -6,12 +6,17 @@
 
 static ThreadPool *SINGLETON;
 
-void ThreadPool::initSingleton()
+void ThreadPool::initSingleton(int threads)
 {
     assert(SINGLETON == nullptr);
-    int t = boost::thread::hardware_concurrency();
-    if(t<2)
-        t = 2;
+	int t;
+	if(threads<1) {
+		t = boost::thread::hardware_concurrency();
+		if(t<2)
+			t = 2;
+	} else {
+		t = threads;
+	}
 
 #ifndef NDEBUG
     std::cerr << "Starting thread pool singleton with " << t << " threads." << std::endl;

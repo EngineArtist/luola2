@@ -4,6 +4,7 @@
 #include <minizip/unzip.h>
 
 #include "datafile.h"
+#include "paths.h"
 
 namespace fs = boost::filesystem;
 namespace io = boost::iostreams;
@@ -227,8 +228,7 @@ class DataFileZip : public DataFileImpl {
 
 DataFile::DataFile(const string& name)
 {
-
-    fs::path path(name);
+    fs::path path = Paths::get().findDataFile(name);
     if(fs::exists(path)) {
         if(is_directory(path)) {
             p_ = shared_ptr<DataFileImpl>(new DataFileDir(name));

@@ -14,6 +14,10 @@
 		"type":    "shader",
 		"subtype": "fragment",
 		"src":     "fragment.shader"
+	},
+	"texture": {
+		"type": "texture",
+		"src" : "test.png"
 	}
 }
 

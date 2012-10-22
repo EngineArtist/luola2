@@ -1,9 +1,8 @@
-#include <iostream>
-
 #include <boost/property_tree/json_parser.hpp>
 
 #include "loader.h"
 #include "shader.h"
+#include "texture.h"
 
 ResourceLoader::ResourceLoader(DataFile& datafile, const string& filename)
     : m_datafile(datafile)
@@ -25,19 +24,17 @@ Resource *ResourceLoader::load(const string& name)
     try {
         type = m_resources.get<string>(name + ".type");
     } catch(const boost::property_tree::ptree_bad_data& ex) {
-        std::cerr << "Warning: resource \"" << name << "\" not found!" << std::endl;
-        return nullptr;
+        throw ResourceException(m_datafile.name(), name, "Resource not found");
     }
 
     if(type=="program")
         return loadProgram(name);
-    if(type=="shader")
+    else if(type=="shader")
         return loadShader(name);
-    else {
-        std::cerr << "Warning: unknown resource type \"" << type << "\" for resource \""
-            << name << "\"!" << std::endl;
-        return nullptr;
-    }
+    else if(type=="texture")
+        return loadTexture(name);
+    else
+        throw ResourceException(m_datafile.name(), name, "Unknown resource type: " + type);
 }
 
 Resource *ResourceLoader::loadProgram(const string& name)
@@ -50,9 +47,7 @@ Resource *ResourceLoader::loadProgram(const string& name)
             Resources::get().unloadResource(pr->name());
             return nullptr;
         } else if(!sr->isShader()) {
-            std::cerr << "Resource \"" << sr->name() << "is not a shader!" << std::endl;
-            Resources::get().unloadResource(pr->name());
-            return nullptr;
+            throw ResourceException(m_datafile.name(), sr->name(), "resource is not a shader!");
         }
         pr->addShader(static_cast<ShaderResource*>(sr));
     }
@@ -73,11 +68,17 @@ Resource *ResourceLoader::loadShader(const string& name)
     else if(stype == "fragment")
         type = Resource::FRAGMENT_SHADER;
     else {
-        std::cerr << "unrecognized shader type: " << stype << std::endl;
-        return nullptr;
+        throw ResourceException(m_datafile.name(), name, "Unrecognized shader type: " + stype);
     }
 
     string src = m_resources.get<string>(name + ".src");
 
     return ShaderResource::load(name, m_datafile, src, type);
+}
+
+Resource *ResourceLoader::loadTexture(const string& name)
+{
+    string src = m_resources.get<string>(name + ".src");
+
+    return TextureResource::load(name, m_datafile, src);
 }

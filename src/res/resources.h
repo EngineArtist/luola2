@@ -16,7 +16,8 @@ public:
     enum Type {
         VERTEX_SHADER,
         FRAGMENT_SHADER,
-        SHADER_PROGRAM
+        SHADER_PROGRAM,
+        TEXTURE
     };
 
     Resource(const string& name, Type type);

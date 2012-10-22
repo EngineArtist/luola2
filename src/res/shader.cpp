@@ -12,7 +12,7 @@ using std::endl;
 ShaderResource *ShaderResource::load(const string& name, DataFile &datafile, const string &filename, Type type)
 {
 #ifndef NDEBUG
-    cerr << "Loading shader " << filename << "..." << std::endl;
+    cerr << "Loading shader " << filename << "..." << endl;
 #endif
     // Load shader source
     DataStream ds(datafile, filename);

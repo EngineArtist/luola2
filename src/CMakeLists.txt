@@ -19,5 +19,6 @@ target_link_libraries(
 	${GLFW_LIBRARIES}
 	${GLEW_LIBRARY}
 	${MINIZIP_LIBRARIES}
+	${PNG_LIBRARY}
 )
 

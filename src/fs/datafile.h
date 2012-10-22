@@ -78,6 +78,13 @@ class DataFile {
         DataFile(const string& name);
 
         /**
+         * Get the name of the datafile
+         *
+         * @return file name
+         */
+        string name() const;
+
+        /**
          * Was there an error opening the file?
          *
          * \return true if data file/directory couldn't be opened

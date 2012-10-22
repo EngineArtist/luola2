@@ -1,5 +1,5 @@
-#include <iostream>
-#include <stdexcept>
+#include <ostream>
+
 #include "resources.h"
 
 namespace {
@@ -18,25 +18,19 @@ Resources &Resources::get()
     return *RESOURCES;
 }
 
-bool Resources::registerResource(Resource *resource)
+void Resources::registerResource(Resource *resource)
 {
-    if(m_resources.count(resource->name())>0) {
-        std::cerr << "Warning: tried to register resource \"" <<
-            resource->name() << "\" which is already registered.\n";
-        return false;
-    } else {
-        m_resources[resource->name()] = resource;
-        return true;
-    }
+    if(m_resources.count(resource->name())>0)
+        throw ResourceException("", resource->name(), "named resource already registered");
+
+    m_resources[resource->name()] = resource;
 }
 
 Resource *Resources::getResource(const string& name)
 {
-    try {
-        return m_resources.at(name);
-    } catch(const std::out_of_range& ex) {
-        return nullptr;
-    }
+    if(m_resources.count(name))
+        return m_resources[name];
+    return nullptr;
 }
 
 void Resources::unloadResource(const string& name)
@@ -55,9 +49,6 @@ Resource::Resource(const string& name, Type type)
 
 Resource::~Resource()
 {
-#ifndef NDEBUG
-    std::cout << "Unloading resource " << m_name << std::endl;
-#endif
     for(Resource *res : m_deps) {
         if(--res->m_refcount==0) {
             RESOURCES->unloadResource(res->m_name);
@@ -79,4 +70,25 @@ bool Resource::isShader() const
             return true;
         default: return false;
     }
+}
+
+ResourceException::ResourceException(const string& datafile, const string& resource, const string& error)
+    : m_datafile(datafile), m_resource(resource), m_error(error)
+{
+}
+
+ResourceException::~ResourceException() throw()
+{
+}
+
+const char *ResourceException::what() const throw()
+{
+    return m_error.c_str();
+}
+
+std::ostream &operator<<(std::ostream &os, const ResourceException &ex)
+{
+    os << "Resource loading exception (" << ex.datafile() << "/" << ex.resource()
+        << "): " << ex.error();
+    return os;
 }

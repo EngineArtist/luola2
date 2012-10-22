@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <exception>
 
 using std::string;
 
@@ -82,14 +83,10 @@ public:
     /**
      * Register a new resource.
      *
-     * If a resource with the same name has already been registered,
-     * the new resource will not be registered and false will be returned.
-     * 
-     * @param name resource name
      * @param resource the resource to registe
-     * @return true if resource was registered
+     * @throw ResourceException if resource with the same name is already registered
      */
-    bool registerResource(Resource *resource);
+    void registerResource(Resource *resource);
 
     /**
      * Get the named resource
@@ -112,5 +109,45 @@ private:
     std::unordered_map<string, Resource*> m_resources;
 };
 
-#endif
+class ostream;
+/**
+ * Resource loading exception
+ */
+class ResourceException : public std::exception
+{
+public:
+    ResourceException(const string& datafile, const string& resource, const string& error);
+    ~ResourceException() throw();
 
+    /**
+     * Get the datafile related to the error
+     * 
+     * @return data file name
+     */
+    const string& datafile() const { return m_datafile; }
+
+    /**
+     * Get the name of the resource related to the error
+     * 
+     * @return resource name
+     */
+    const string& resource() const { return m_resource; }
+
+    /**
+     * Get the error string
+     * 
+     * @return error string
+     */
+    const string& error() const { return m_error; }
+
+    const char *what() const throw();
+
+    friend std::ostream& operator<<(std::ostream&, const ResourceException&);
+ 
+private:
+    string m_datafile;
+    string m_resource;
+    string m_error;
+};
+
+#endif

@@ -24,27 +24,40 @@ DataSourceImpl::~DataSourceImpl() {}
 
 //! Base class for data file implementations
 class DataFileImpl {
-    public:
-        virtual ~DataFileImpl() {}
-        virtual bool isError() const = 0;
-        virtual string errorString() const = 0;
-        virtual DataSourceImpl *getSource(const string& resource) = 0;
+public:
+    DataFileImpl(fs::path path)
+        : m_path(path), m_reserved(false)
+    {
+    }
 
-        bool reserve()
-        {
-            if(reserved_)
-                return false;
-            reserved_ = true;
-            return true;
-        }
+    virtual ~DataFileImpl() {}
+    virtual bool isError() const = 0;
+    virtual string errorString() const = 0;
+    virtual DataSourceImpl *getSource(const string& resource) = 0;
 
-        void release()
-        {
-            reserved_ = false;
-        }
+    string name() const
+    {
+        return m_path.native();
+    }
 
-    private:
-        bool reserved_;
+    bool reserve()
+    {
+        if(m_reserved)
+            return false;
+        m_reserved = true;
+        return true;
+    }
+
+    void release()
+    {
+        m_reserved = false;
+    }
+
+protected:
+    const fs::path m_path;
+
+private:
+    bool m_reserved;
 };
 
 //! A data source that wraps a file
@@ -166,68 +179,64 @@ class DataSourceZip : public DataSourceImpl {
 
 //! Directory based data file implementation
 class DataFileDir : public DataFileImpl {
-    public:
-        DataFileDir(const fs::path& path)
-            : path_(path)
-        {
-        }
+public:
+    DataFileDir(const fs::path& path)
+        : DataFileImpl(path)
+    {
+    }
 
-        DataSourceImpl *getSource(const string& resource)
-        {
-            return new DataSourceFile(path_ / resource);
-        }
+    DataSourceImpl *getSource(const string& resource)
+    {
+        return new DataSourceFile(m_path / resource);
+    }
 
-        bool isError() const
-        {
-            return false;
-        }
+    bool isError() const
+    {
+        return false;
+    }
 
-        string errorString() const
-        {
-            return "";
-        }
-
-    private:
-        fs::path path_;
+    string errorString() const
+    {
+        return "";
+    }
 };
 
 //! ZIP file based data file implementation
 class DataFileZip : public DataFileImpl {
-    public:
-        DataFileZip(const fs::path& path)
-            : path_(path), error_(0)
-        {
-            zip_ = unzOpen(path.c_str());
-            if(zip_ == nullptr)
-                error_ = 1;
-        }
+public:
+    DataFileZip(const fs::path& path)
+        : DataFileImpl(path), m_error(0)
+    {
+        m_zip = unzOpen(path.c_str());
+        if(!m_zip)
+            m_error = 1;
+    }
 
-        ~DataFileZip()
-        {
-            unzClose(zip_);
-        }
+    ~DataFileZip()
+    {
+        unzClose(m_zip);
+    }
 
-        DataSourceImpl *getSource(const string& source)
-        {
-            return new DataSourceZip(this, zip_, source);
-        }
+    DataSourceImpl *getSource(const string& source)
+    {
+        return new DataSourceZip(this, m_zip, source);
+    }
 
-        bool isError() const
-        {
-            return error_ != UNZ_OK;
-        }
+    bool isError() const
+    {
+        return m_error != UNZ_OK;
+    }
 
-        string errorString() const
-        {
-            return zipErrorToString(error_);
-        }
+    string errorString() const
+    {
+        return zipErrorToString(m_error);
+    }
 
-        bool inuse;
+    bool inuse;
 
-    private:
-        fs::path path_;
-        unzFile zip_;
-        int error_;
+private:
+    unzFile m_zip;
+    int m_error;
 };
 
 DataFile::DataFile(const string& name)
@@ -247,6 +256,13 @@ bool DataFile::isError() const
     if(p_)
         return p_->isError();
     return true;
+}
+
+string DataFile::name() const
+{
+    if(p_)
+        return p_->name();
+    return string();
 }
 
 string DataFile::errorString() const

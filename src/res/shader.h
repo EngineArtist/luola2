@@ -19,6 +19,7 @@ public:
      * @param filename shader file name (inside datafile)
      * @param type resource type. Must be one of the _SHADER types.
      * @return new ShaderResource
+     * @throw ResourceException in case of error
      */
     static ShaderResource *load(const string& name, DataFile &datafile, const string& filename, Type type);
 
@@ -53,6 +54,7 @@ public:
     /**
      * Link the program.
      * @return true on success
+     * @throw ResourceException on error
      */
     bool link();
 

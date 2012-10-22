@@ -1,4 +1,8 @@
+#ifndef NDEBUG
 #include <iostream>
+using std::cerr;
+using std::endl;
+#endif
 
 #include <GL/glew.h>
 
@@ -8,23 +12,19 @@
 ShaderResource *ShaderResource::load(const string& name, DataFile &datafile, const string &filename, Type type)
 {
 #ifndef NDEBUG
-    std::cout << "Loading shader " << filename << "..." << std::endl;
+    cerr << "Loading shader " << filename << "..." << std::endl;
 #endif
     // Load shader source
     DataStream ds(datafile, filename);
-    if(ds->isError()) {
-        std::cerr << "Error loading shader " << filename << ": " << ds->errorString() << std::endl;
-        return nullptr;
-    }
+    if(ds->isError())
+        throw ResourceException(datafile.name(), name, ds->errorString());
 
     std::string program(
         (std::istreambuf_iterator<char>(ds)),
         std::istreambuf_iterator<char>()
         );
-    if(ds->isError()) {
-        std::cerr << "Error reading shader " << filename << ": " << ds->errorString() << std::endl;
-        return nullptr;
-    }
+    if(ds->isError())
+        throw ResourceException(datafile.name(), name, ds->errorString());
 
     // Compile Vertex Shader
     GLenum shaderType;
@@ -32,8 +32,7 @@ ShaderResource *ShaderResource::load(const string& name, DataFile &datafile, con
         case VERTEX_SHADER: shaderType = GL_VERTEX_SHADER; break;
         case FRAGMENT_SHADER: shaderType = GL_FRAGMENT_SHADER; break;
         default:
-            std::cerr << "Unsupported shader type: " << type << "\n";
-            return nullptr;
+            throw ResourceException(datafile.name(), name, "Unsupported shader type");
     }
 
     GLuint id = glCreateShader(shaderType);
@@ -51,10 +50,9 @@ ShaderResource *ShaderResource::load(const string& name, DataFile &datafile, con
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infologlen);
         std::vector<char> errormessage(infologlen);
         glGetShaderInfoLog(id, infologlen, nullptr, &errormessage[0]);
-
-        std::cerr << "Error compiling shader: " << &errormessage[0];
         glDeleteShader(id);
-        return nullptr;
+
+        throw ResourceException(datafile.name(), name, &errormessage[0]);
     }
 
     // Create resource
@@ -99,7 +97,7 @@ void ProgramResource::addShader(ShaderResource *shader)
 bool ProgramResource::link()
 {
 #ifndef NDEBUG
-    std::cout << "Linking shader program " << name() << "..." << std::endl;
+    cerr << "Linking shader program " << name() << "..." << endl;
 #endif
     glLinkProgram(m_id);
 
@@ -112,8 +110,7 @@ bool ProgramResource::link()
         std::vector<char> errormessage(infologlen);
         glGetProgramInfoLog(m_id, infologlen, nullptr, &errormessage[0]);
 
-        std::cerr << "Error linking program: " << errormessage[0] << "\n";
-        return false;
+        throw ResourceException("", name(), &errormessage[0]);
     }
     return true;
 }

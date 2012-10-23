@@ -2,6 +2,8 @@
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "fs/datafile.h"
 #include "res/shader.h"
@@ -12,10 +14,6 @@
 void gameloop()
 {
     glfwEnable( GLFW_STICKY_KEYS );
-
-    GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
 
     ProgramResource *program;
     TextureResource *texture;
@@ -45,6 +43,10 @@ void gameloop()
         0.5f, 1.0f,
     };
 
+    GLuint VertexArrayID;
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -57,10 +59,37 @@ void gameloop()
 
     GLuint TextureID  = glGetUniformLocation(program->id(), "myTextureSampler");
 
+    GLuint MatrixID = glGetUniformLocation(program->id(), "MVP");
+
+    float x=0, y=0, vx=0.02, vy=0.01, r;
+
+    glm::mat4 proj = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    // Camera matrix
+    glm::mat4 view = glm::lookAt(
+        glm::vec3(0,0,20),
+        glm::vec3(0,0,0),
+        glm::vec3(0,1,0)
+    );
+
     do {
         glClear( GL_COLOR_BUFFER_BIT );
 
+        // animate
+        x += vx;
+        y += vy;
+        r += 0.1;
+        if(x<-10 || x>10)
+            vx = -vx;
+        if(y<-7.5 || y>7.5)
+            vy = -vy;
+
+        // draw
+        glm::mat4 model = glm::rotate(glm::translate(glm::mat4(1.0f),glm::vec3(x, y,0)), r, glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 MVP = proj * view * model;
+
         glUseProgram(program->id());
+
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture->id());
@@ -77,7 +106,7 @@ void gameloop()
             0,
             (void*)0
         );
-        
+
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
         glVertexAttribPointer(

@@ -15,6 +15,7 @@ class Resource {
 public:
     enum Type {
         VERTEX_SHADER,
+        GEOMETRY_SHADER,
         FRAGMENT_SHADER,
         SHADER_PROGRAM,
         TEXTURE
@@ -29,13 +30,6 @@ public:
      * @return resource type
      */
     Type type() const { return m_type; }
-
-    /**
-     * Is this a shader type resource
-     *
-     * @return true if resource type is one of the _SHADERs
-     */
-    bool isShader() const;
 
     /**
      * Get the name of the resource

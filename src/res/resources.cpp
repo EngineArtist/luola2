@@ -62,16 +62,6 @@ void Resource::addDependency(Resource *dep)
     m_deps.push_back(dep);
 }
 
-bool Resource::isShader() const
-{
-    switch(m_type) {
-        case VERTEX_SHADER:
-        case FRAGMENT_SHADER:
-            return true;
-        default: return false;
-    }
-}
-
 ResourceException::ResourceException(const string& datafile, const string& resource, const string& error)
     : m_datafile(datafile), m_resource(resource), m_error(error)
 {

@@ -23,6 +23,7 @@ public:
      */
     static ShaderResource *load(const string& name, DataFile &datafile, const string& filename, Type type);
 
+    ShaderResource() = delete;
     ~ShaderResource();
 
     GLuint id() const { return m_id; }
@@ -38,14 +39,23 @@ private:
  */
 class ProgramResource : public Resource {
 public:
+    ProgramResource() = delete;
+    ~ProgramResource();
+
     /**
      * Create a new program.
+     *
      * To finalize, you must add shaders to this program and finally call link().
+     * The program will be automatically registered with the resource manager.
+     *
+     * @param name resource name
      */
     static ProgramResource *make(const string& name);
 
     /**
      * Add a shader to this program.
+     *
+     * This function cannot be called anymore after the program has been linked.
      * @param shader shader to add
      * @return reference to this
      */
@@ -53,10 +63,9 @@ public:
 
     /**
      * Link the program.
-     * @return true on success
      * @throw ResourceException on error
      */
-    bool link();
+    void link();
 
     GLuint id() const { return m_id; }
 
@@ -64,6 +73,7 @@ private:
     ProgramResource(const string& name, GLuint id);
 
     GLuint m_id;
+    bool m_linked;
 };
 
 #endif

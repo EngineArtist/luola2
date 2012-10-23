@@ -41,20 +41,18 @@ Resource *ResourceLoader::loadProgram(const string& name)
 {
     ProgramResource *pr = ProgramResource::make(name);
 
-    for(const boost::property_tree::ptree::value_type &pt : m_resources.get_child(name + ".shaders")) {
+    for(const auto &pt : m_resources.get_child(name + ".shaders")) {
         Resource *sr = load(pt.second.get_value<string>());
         if(!sr) {
             Resources::get().unloadResource(pr->name());
             return nullptr;
-        } else if(!sr->isShader()) {
+        } else if(!dynamic_cast<ShaderResource*>(sr)) {
             throw ResourceException(m_datafile.name(), sr->name(), "resource is not a shader!");
         }
         pr->addShader(static_cast<ShaderResource*>(sr));
     }
-    if(!pr->link()) {
-        Resources::get().unloadResource(pr->name());
-        return nullptr;
-    }
+
+    pr->link();
 
     return pr;
 }

@@ -9,7 +9,11 @@ using std::endl;
 #include "shader.h"
 #include "../fs/datafile.h"
 
-ShaderResource *ShaderResource::load(const string& name, DataFile &datafile, const string &filename, Type type)
+ShaderResource *ShaderResource::load(
+    const string& name,
+    DataFile &datafile,
+    const string &filename,
+    Type type)
 {
 #ifndef NDEBUG
     cerr << "Loading shader " << filename << "..." << endl;
@@ -30,6 +34,7 @@ ShaderResource *ShaderResource::load(const string& name, DataFile &datafile, con
     GLenum shaderType;
     switch(type) {
         case VERTEX_SHADER: shaderType = GL_VERTEX_SHADER; break;
+        case GEOMETRY_SHADER: shaderType = GL_GEOMETRY_SHADER; break;
         case FRAGMENT_SHADER: shaderType = GL_FRAGMENT_SHADER; break;
         default:
             throw ResourceException(datafile.name(), name, "Unsupported shader type");
@@ -81,20 +86,27 @@ ProgramResource *ProgramResource::make(const string& name)
 }
 
 ProgramResource::ProgramResource(const string& name, GLuint id)
-    : Resource(name, SHADER_PROGRAM), m_id(id)
+    : Resource(name, SHADER_PROGRAM), m_id(id), m_linked(false)
 {
+}
+
+ProgramResource::~ProgramResource()
+{
+    glDeleteProgram(m_id);
 }
 
 void ProgramResource::addShader(ShaderResource *shader)
 {
-    assert(shader);
-    if(shader) {
-        glAttachShader(m_id, shader->id());
-        addDependency(shader);
-    }
+    if(m_linked)
+        throw ResourceException("", name(), "tried to add shader to a linked program");
+    if(!shader)
+        throw ResourceException("", name(), "tried to add null shader to this program");
+
+    glAttachShader(m_id, shader->id());
+    addDependency(shader);
 }
 
-bool ProgramResource::link()
+void ProgramResource::link()
 {
 #ifndef NDEBUG
     cerr << "Linking shader program " << name() << "..." << endl;
@@ -112,5 +124,5 @@ bool ProgramResource::link()
 
         throw ResourceException("", name(), &errormessage[0]);
     }
-    return true;
+    m_linked = true;
 }

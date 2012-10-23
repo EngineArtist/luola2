@@ -35,6 +35,7 @@ endif()
 find_package(Boost COMPONENTS system filesystem program_options thread REQUIRED)
 find_package(GLFW REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(GLM REQUIRED)
 find_package(PNG REQUIRED)
 find_package(MiniZip REQUIRED)
 

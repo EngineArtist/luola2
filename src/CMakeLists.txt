@@ -18,6 +18,7 @@ target_link_libraries(
 	${Boost_LIBRARIES}
 	${GLFW_LIBRARIES}
 	${GLEW_LIBRARY}
+	${GLM_LIBRARY}
 	${MINIZIP_LIBRARIES}
 	${PNG_LIBRARY}
 )

@@ -33,6 +33,7 @@ private:
     Resource *loadProgram(const string& name);
     Resource *loadShader(const string& name);
     Resource *loadTexture(const string& name);
+    Resource *loadMesh(const string& name);
 
     DataFile m_datafile;
     boost::property_tree::ptree m_resources;

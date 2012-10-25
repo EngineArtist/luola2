@@ -3,6 +3,7 @@
 #include "loader.h"
 #include "shader.h"
 #include "texture.h"
+#include "mesh.h"
 
 ResourceLoader::ResourceLoader(DataFile& datafile, const string& filename)
     : m_datafile(datafile)
@@ -33,6 +34,8 @@ Resource *ResourceLoader::load(const string& name)
         return loadShader(name);
     else if(type=="texture")
         return loadTexture(name);
+    else if(type=="mesh")
+        return loadMesh(name);
     else
         throw ResourceException(m_datafile.name(), name, "Unknown resource type: " + type);
 }
@@ -79,4 +82,11 @@ Resource *ResourceLoader::loadTexture(const string& name)
     string src = m_resources.get<string>(name + ".src");
 
     return TextureResource::load(name, m_datafile, src);
+}
+
+Resource *ResourceLoader::loadMesh(const string& name)
+{
+    string src = m_resources.get<string>(name + ".src");
+
+    return MeshResource::load(name, m_datafile, src);
 }

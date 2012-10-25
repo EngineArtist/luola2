@@ -18,7 +18,8 @@ public:
         GEOMETRY_SHADER,
         FRAGMENT_SHADER,
         SHADER_PROGRAM,
-        TEXTURE
+        TEXTURE,
+        MESH
     };
 
     Resource(const string& name, Type type);

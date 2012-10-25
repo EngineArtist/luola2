@@ -8,6 +8,7 @@
 #include "fs/datafile.h"
 #include "res/shader.h"
 #include "res/texture.h"
+#include "res/mesh.h"
 #include "res/loader.h"
 #include "game.h"
 
@@ -17,51 +18,44 @@ void gameloop()
 
     ProgramResource *program;
     TextureResource *texture;
+    MeshResource *mesh;
     {
-        DataFile df("test.shaders");
+        DataFile df("test.ship");
         if(df.isError()) {
             std::cerr << df.errorString() << "\n";
             return;
         }
 
-        ResourceLoader rl(df, "sample.res");
-        program = static_cast<ProgramResource*>(rl.load("program"));
-
-        texture = static_cast<TextureResource*>(rl.load("texture"));
+        ResourceLoader rl(df, "resources.json");
+        mesh = static_cast<MeshResource*>(rl.load("ship:mesh"));
+        texture = static_cast<TextureResource*>(rl.load("ship:texture"));
+        program = static_cast<ProgramResource*>(rl.load("ship:shader"));
     }
 
-
-    static const GLfloat g_vertex_buffer_data[] = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f,  1.0f, 0.0f,
-    };
-
-    static const GLfloat g_uv_buffer_data[] = {
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        0.5f, 1.0f,
-    };
+    GLuint TextureID  = glGetUniformLocation(program->id(), "myTextureSampler");
+    GLuint MatrixID = glGetUniformLocation(program->id(), "MVP");
 
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
-    GLuint vertexbuffer;
-    glGenBuffers(1, &vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture->id());
+    glUniform1i(TextureID, 0);
 
-    GLuint uvbuffer;
-    glGenBuffers(1, &uvbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId());
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    GLuint TextureID  = glGetUniformLocation(program->id(), "myTextureSampler");
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBufferId());
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    GLuint MatrixID = glGetUniformLocation(program->id(), "MVP");
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->elementArrayId());
 
-    float x=0, y=0, vx=0.02, vy=0.01, r;
+    float x=0, y=0, vx=0.01, vy=0.005, r=0.0;
 
     glm::mat4 proj = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
@@ -70,6 +64,7 @@ void gameloop()
         glm::vec3(0,0,0),
         glm::vec3(0,1,0)
     );
+    glFrontFace(GL_CW);
 
     do {
         glClear( GL_COLOR_BUFFER_BIT );
@@ -77,50 +72,20 @@ void gameloop()
         // animate
         x += vx;
         y += vy;
-        r += 0.1;
+        r += 0.05;
         if(x<-10 || x>10)
             vx = -vx;
         if(y<-7.5 || y>7.5)
             vy = -vy;
 
-        // draw
         glm::mat4 model = glm::rotate(glm::translate(glm::mat4(1.0f),glm::vec3(x, y,0)), r, glm::vec3(0.0f, 0.0f, 1.0f));
         glm::mat4 MVP = proj * view * model;
 
-        glUseProgram(program->id());
-
+        // draw
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture->id());
-        // Set our "myTextureSampler" sampler to user Texture Unit 0
-        glUniform1i(TextureID, 0);
-
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        glVertexAttribPointer(
-            0,
-            3,
-            GL_FLOAT,
-            GL_FALSE,
-            0,
-            (void*)0
-        );
-
-        glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-        glVertexAttribPointer(
-            1,
-            2,
-            GL_FLOAT,
-            GL_FALSE,
-            0,
-            (void*)0
-        );
-
-        glDrawArrays(GL_TRIANGLES, 0, 3); // From index 0 to 3 -> 1 triangle
-
-        glDisableVertexAttribArray(0);
+        glUseProgram(program->id());
+        //glDrawArrays(GL_TRIANGLES, 0, 6); // From index 0 to 3 -> 1 triangle
+        glDrawElements(GL_TRIANGLES, mesh->faceCount(), GL_UNSIGNED_SHORT, 0);
 
         glfwSwapBuffers();
 
@@ -128,6 +93,5 @@ void gameloop()
 
     Resources::get().unloadResource("program");
 
-    glDeleteBuffers(1, &vertexbuffer);
     glDeleteVertexArrays(1, &VertexArrayID);
 }

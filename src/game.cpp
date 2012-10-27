@@ -26,10 +26,10 @@ void gameloop()
             return;
         }
 
-        ResourceLoader rl(df, "resources.json");
-        mesh = static_cast<MeshResource*>(rl.load("ship:mesh"));
-        texture = static_cast<TextureResource*>(rl.load("ship:texture"));
-        program = static_cast<ProgramResource*>(rl.load("ship:shader"));
+        ResourceLoader rl(df, "resources.yaml");
+        mesh = static_cast<MeshResource*>(rl.load("ship.mesh"));
+        texture = static_cast<TextureResource*>(rl.load("ship.texture"));
+        program = static_cast<ProgramResource*>(rl.load("ship.shader"));
     }
 
     GLuint TextureID  = glGetUniformLocation(program->id(), "myTextureSampler");

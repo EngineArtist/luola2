@@ -38,6 +38,7 @@ find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
 find_package(PNG REQUIRED)
 find_package(MiniZip)
+find_package(YamlCpp REQUIRED)
 
 # Generate config.h
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h)

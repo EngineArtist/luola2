@@ -24,6 +24,7 @@ target_link_libraries(
 	${GLEW_LIBRARY}
 	${GLM_LIBRARY}
 	${PNG_LIBRARY}
+	${YAMLCPP_LIBRARY}
 )
 
 if (MINIZIP_FOUND)

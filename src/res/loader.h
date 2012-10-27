@@ -1,7 +1,7 @@
 #ifndef LUOLA_RESOURCE_LOADER_H
 #define LUOLA_RESOURCE_LOADER_H
 
-#include <boost/property_tree/ptree.hpp>
+#include <yaml-cpp/node.h>
 
 #include "../fs/datafile.h"
 #include "resources.h"
@@ -36,7 +36,7 @@ private:
     Resource *loadMesh(const string& name);
 
     DataFile m_datafile;
-    boost::property_tree::ptree m_resources;
+    YAML::Node m_resources;
 };
 
 #endif

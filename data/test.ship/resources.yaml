@@ -1,0 +1,23 @@
+ship.mesh:
+    type: mesh
+    src: vwing.mesh
+
+ship.texture:
+    type: texture
+    src: texture.png
+
+ship.shader:
+    type: program
+    shaders:
+        - ship.vs
+        - ship.fs
+
+ship.vs:
+    type: shader
+    subtype: vertex
+    src: vertex.shader
+
+ship.fs:
+    type: shader
+    subtype: fragment
+    src: fragment.shader

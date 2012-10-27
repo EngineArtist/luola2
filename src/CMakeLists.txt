@@ -1,6 +1,6 @@
 include_directories(
 	${Boost_INCLUDE_DIRS}
-	${GLFW_INCLUDE_DIR}
+	${GLFW_INCLUDE_PATH}
 )
 
 file(

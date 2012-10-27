@@ -20,7 +20,7 @@
 # Allow the user to select to link to a shared library or to a static library.
 
 #Search for the include file...
-FIND_PATH(GLFW_INCLUDE_DIRS GL/glfw.h DOC "Path to GLFW include directory."
+FIND_PATH(GLFW_INCLUDE_PATH GL/glfw.h DOC "Path to GLFW include directory."
   HINTS
   $ENV{GLFW_ROOT}
   PATH_SUFFIX include #For finding the include file under the root of the glfw expanded archive, typically on Windows.
@@ -34,7 +34,7 @@ FIND_PATH(GLFW_INCLUDE_DIRS GL/glfw.h DOC "Path to GLFW include directory."
  
 )
 
-FIND_LIBRARY(GLFW_LIBRARIES DOC "Absolute path to GLFW library."
+FIND_LIBRARY(GLFW_LIBRARY DOC "Absolute path to GLFW library."
   NAMES glfw GLFW.lib
   HINTS
   $ENV{GLFW_ROOT}
@@ -45,8 +45,5 @@ FIND_LIBRARY(GLFW_LIBRARIES DOC "Absolute path to GLFW library."
   ${GLFW_ROOT_DIR}/lib-msvc100/release # added by ptr
 )
 
-SET(GLFW_FOUND 0)
-IF(GLFW_LIBRARY AND GLFW_INCLUDE_DIR)
-  SET(GLFW_FOUND 1)
-  message(STATUS "GLFW found!")
-ENDIF(GLFW_LIBRARY AND GLFW_INCLUDE_DIR)
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(GLFW DEFAULT_MSG GLFW_LIBRARY GLFW_INCLUDE_PATH)

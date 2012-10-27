@@ -1,7 +1,7 @@
 #ifndef LUOLA_RESOURCE_MESH_H
 #define LUOLA_RESOURCE_MESH_H
 
-#include <GL/gl.h>
+#include <GL/glfw.h>
 
 #include "resources.h"
 

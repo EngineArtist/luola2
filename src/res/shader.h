@@ -1,7 +1,7 @@
 #ifndef LUOLA_SHADER_RESOURCES_H
 #define LUOLA_SHADER_RESOURCES_H
 
-#include <GL/gl.h>
+#include <GL/glfw.h>
 
 #include "resources.h"
 

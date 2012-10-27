@@ -1,7 +1,7 @@
 #ifndef LUOLA_RESOURCE_TEXTURE_H
 #define LUOLA_RESOURCE_TEXTURE_H
 
-#include <GL/gl.h>
+#include <GL/glfw.h>
 
 #include "resources.h"
 

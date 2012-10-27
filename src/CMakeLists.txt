@@ -13,10 +13,14 @@ add_executable(
 	${SOURCES}
 )
 
+set(CMAKE_EXE_LINKER_FLAGS
+    "-framework OpenGL"
+)
+
 target_link_libraries(
 	luola2
 	${Boost_LIBRARIES}
-	${GLFW_LIBRARIES}
+	${GLFW_LIBRARY}
 	${GLEW_LIBRARY}
 	${GLM_LIBRARY}
 	${PNG_LIBRARY}

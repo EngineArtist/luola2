@@ -19,7 +19,8 @@ public:
         FRAGMENT_SHADER,
         SHADER_PROGRAM,
         TEXTURE,
-        MESH
+        MESH,
+        MODEL
     };
 
     Resource(const string& name, Type type);

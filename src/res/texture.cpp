@@ -44,14 +44,14 @@ TextureResource *TextureResource::load(const string& name, DataFile &datafile, c
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    TextureResource *res = new TextureResource(name, id, img.width, img.height);
+    TextureResource *res = new TextureResource(name, id, img.width, img.height, GL_TEXTURE_2D);
     Resources::get().registerResource(res);
 
     return res;
 }
 
-TextureResource::TextureResource(const string& name, GLuint id, int width, int height)
-    : Resource(name, TEXTURE), m_id(id), m_width(width), m_height(height)
+TextureResource::TextureResource(const string& name, GLuint id, int width, int height, GLenum target)
+    : Resource(name, TEXTURE), m_id(id), m_width(width), m_height(height), m_target(target)
 {
 
 }

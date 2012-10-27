@@ -4,6 +4,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "mesh.h"
+#include "model.h"
 
 ResourceLoader::ResourceLoader(DataFile& datafile, const string& filename)
     : m_datafile(datafile)
@@ -42,6 +43,8 @@ Resource *ResourceLoader::load(const string& name)
         return loadTexture(name);
     else if(type=="mesh")
         return loadMesh(name);
+    else if(type=="model")
+        return loadModel(name);
     else
         throw ResourceException(m_datafile.name(), name, "Unknown resource type: " + type);
 }
@@ -64,6 +67,39 @@ Resource *ResourceLoader::loadProgram(const string& name)
     pr->link();
 
     return pr;
+}
+
+Resource *ResourceLoader::loadModel(const string& name)
+{
+    const YAML::Node &m = m_resources[name];
+
+    Resource *mesh = load(m["mesh"].to<string>());
+    if(mesh->type() != Resource::MESH)
+        throw ResourceException(m_datafile.name(), name, mesh->name() + " is not a mesh!");
+
+    Resource *shader = load(m["shader"].to<string>());
+    if(shader->type() != Resource::SHADER_PROGRAM)
+        throw ResourceException(m_datafile.name(), name, shader->name() + " is not a shader program!");
+
+    ModelResource::SamplerTextures textures;
+    if(const YAML::Node *texnode = m.FindValue("textures")) {
+        for(const YAML::Node &n : *texnode) {
+            Resource *tr = load(n["texture"].to<string>());
+            if(tr->type() != Resource::TEXTURE)
+                throw ResourceException(m_datafile.name(), name, shader->name() + " is not a texture!");
+
+            textures.push_back(ModelResource::SamplerTexture(
+                n["sampler"].to<string>(),
+                static_cast<TextureResource*>(tr)
+                ));
+        }
+    }
+
+    return ModelResource::make(
+        name,
+        static_cast<MeshResource*>(mesh),
+        static_cast<ProgramResource*>(shader),
+        textures);
 }
 
 Resource *ResourceLoader::loadShader(const string& name)

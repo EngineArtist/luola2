@@ -9,8 +9,6 @@ class DataFile;
 
 class TextureResource : public Resource {
 public:
-    TextureResource() = delete;
-
     /**
      * Load a texture from a datafile.
      *
@@ -24,6 +22,7 @@ public:
      */
     static TextureResource *load(const string& name, DataFile &datafile, const string& filename);
 
+    TextureResource() = delete;
     ~TextureResource();
 
     GLuint id() const { return m_id; }
@@ -42,11 +41,21 @@ public:
      */
     int height() const { return m_height; }
 
+    /**
+     * Return the OpenGL texture target.
+     *
+     * This is GL_TEXTURE_2D for images.
+     *
+     * @return texture target
+     */
+    GLenum target() const { return m_target; }
+
 private:
-    TextureResource(const string& name, GLuint id, int width, int height);
+    TextureResource(const string& name, GLuint id, int width, int height, GLenum target);
 
     GLuint m_id;
     int m_width, m_height;
+    GLenum m_target;
 };
 
 #endif

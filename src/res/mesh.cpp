@@ -25,6 +25,10 @@ MeshResource *MeshResource::load(
     DataFile &datafile,
     const string &filename)
 {
+#ifndef NDEBUG
+    cerr << "Loading mesh " << filename << "..." << endl;
+#endif
+
     DataStream ds(datafile, filename);
     if(ds->isError())
         throw ResourceException(datafile.name(), name, ds->errorString());

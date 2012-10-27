@@ -1,7 +1,14 @@
 #include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
+
+#include "../config.h"
+
+#ifdef MINIZIP_FOUND
 #include <minizip/unzip.h>
+#else
+#warning No ZIP file support
+#endif
 
 #include "datafile.h"
 #include "paths.h"
@@ -98,6 +105,7 @@ class DataSourceFile : public DataSourceImpl {
         string error_;
 };
 
+#ifdef MINIZIP_FOUND
 static string zipErrorToString(int error)
 {
     std::stringstream ss;
@@ -176,6 +184,7 @@ class DataSourceZip : public DataSourceImpl {
         int error_;
         unsigned int len_;
 };
+#endif
 
 //! Directory based data file implementation
 class DataFileDir : public DataFileImpl {
@@ -201,6 +210,7 @@ public:
     }
 };
 
+#ifdef MINIZIP_FOUND
 //! ZIP file based data file implementation
 class DataFileZip : public DataFileImpl {
 public:
@@ -238,15 +248,19 @@ private:
     unzFile m_zip;
     int m_error;
 };
+#endif
 
 DataFile::DataFile(const string& name)
+	: p_(nullptr)
 {
     fs::path path = Paths::get().findDataFile(name);
     if(fs::exists(path)) {
         if(is_directory(path)) {
             p_ = shared_ptr<DataFileImpl>(new DataFileDir(path));
         } else {
+#ifdef MINIZIP_FOUND
             p_ = shared_ptr<DataFileImpl>(new DataFileZip(path));
+#endif
         }
     } 
 }

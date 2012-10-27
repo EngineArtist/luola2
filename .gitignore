@@ -11,6 +11,9 @@
 *.la
 *.a
 
+# Generated files
+src/config.h
+
 # Temporary files
 *.swp
 *~

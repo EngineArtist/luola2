@@ -37,7 +37,10 @@ find_package(GLFW REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
 find_package(PNG REQUIRED)
-find_package(MiniZip REQUIRED)
+find_package(MiniZip)
+
+# Generate config.h
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h)
 
 # Source
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)

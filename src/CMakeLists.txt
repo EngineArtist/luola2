@@ -19,7 +19,12 @@ target_link_libraries(
 	${GLFW_LIBRARIES}
 	${GLEW_LIBRARY}
 	${GLM_LIBRARY}
-	${MINIZIP_LIBRARIES}
 	${PNG_LIBRARY}
 )
 
+if (MINIZIP_FOUND)
+    target_link_libraries(
+        luola2
+	    ${MINIZIP_LIBRARIES}
+    )
+endif (MINIZIP_FOUND)

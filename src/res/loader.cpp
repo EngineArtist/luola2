@@ -5,6 +5,7 @@
 #include "texture.h"
 #include "mesh.h"
 #include "model.h"
+#include "font.h"
 
 ResourceLoader::ResourceLoader(DataFile& datafile, const string& filename)
     : m_datafile(datafile)
@@ -45,6 +46,8 @@ Resource *ResourceLoader::load(const string& name)
         return loadMesh(name);
     else if(type=="model")
         return loadModel(name);
+    else if(type=="font")
+        return loadFont(name);
     else
         throw ResourceException(m_datafile.name(), name, "Unknown resource type: " + type);
 }
@@ -100,6 +103,26 @@ Resource *ResourceLoader::loadModel(const string& name)
         static_cast<MeshResource*>(mesh),
         static_cast<ProgramResource*>(shader),
         textures);
+}
+
+Resource *ResourceLoader::loadFont(const string& name)
+{
+    const YAML::Node &m = m_resources[name];
+
+    Resource *texture = load(m["texture"].to<string>());
+    if(texture->type() != Resource::TEXTURE)
+        throw ResourceException(m_datafile.name(), name, texture->name() + " is not a texture!");
+
+    Resource *shader = load(m["shader"].to<string>());
+    if(shader->type() != Resource::SHADER_PROGRAM)
+        throw ResourceException(m_datafile.name(), name, shader->name() + " is not a shader program!");
+
+    return FontResource::load(
+        name,
+        m_datafile,
+        m["description"].to<string>(),
+        static_cast<TextureResource*>(texture),
+        static_cast<ProgramResource*>(shader));
 }
 
 Resource *ResourceLoader::loadShader(const string& name)

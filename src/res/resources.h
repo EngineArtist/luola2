@@ -20,7 +20,8 @@ public:
         SHADER_PROGRAM,
         TEXTURE,
         MESH,
-        MODEL
+        MODEL,
+        FONT
     };
 
     Resource(const string& name, Type type);

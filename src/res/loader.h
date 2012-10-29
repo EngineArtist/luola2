@@ -35,6 +35,7 @@ private:
     Resource *loadTexture(const string& name);
     Resource *loadMesh(const string& name);
     Resource *loadModel(const string& name);
+    Resource *loadFont(const string& name);
 
     DataFile m_datafile;
     YAML::Node m_resources;

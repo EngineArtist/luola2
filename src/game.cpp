@@ -8,6 +8,7 @@
 #include "fs/datafile.h"
 #include "res/loader.h"
 #include "res/model.h"
+#include "res/font.h"
 
 #include "game.h"
 
@@ -22,6 +23,18 @@ void gameloop()
 {
     glfwEnable( GLFW_STICKY_KEYS );
     glFrontFace(GL_CW);
+
+    FontResource *font;
+    {
+        DataFile df("core.data");
+        if(df.isError()) {
+            std::cerr << df.errorString() << "\n";
+            return;
+        }
+
+        ResourceLoader rl(df, "resources.yaml");
+        font = static_cast<FontResource*>(rl.load("core.font"));
+    }
 
     ModelResource *ship1, *ship2, *ship3;
     {
@@ -55,6 +68,9 @@ void gameloop()
 
     glm::mat4 PV = proj * view;
 
+    double lastTime = glfwGetTime();
+    int frames=0, fps=0;
+    string teststr = "Hello world!";
     do {
         glClear( GL_COLOR_BUFFER_BIT );
 
@@ -80,7 +96,18 @@ void gameloop()
         glm::mat4 model3 = glm::rotate(glm::translate(glm::mat4(1.0f), pos3), r3, glm::vec3(0.0f, 0.0f, 1.0f));
         ship3->render(PV * model3);
 
+        font->text("FPS: %d", fps).scale(0.5).pos(1,1).align(TextRenderer::RIGHT).color(1,1,0).render();
+
+        font->text(teststr).pos(-1,-0.8).color(0,1,0).render();
+
         glfwSwapBuffers();
+        double lt = glfwGetTime();
+        ++frames;
+        if(lt - lastTime >= 0.1) {
+            lastTime = lt;
+            fps = frames * 10;
+            frames = 0;
+        }
 
     } while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
 

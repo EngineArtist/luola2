@@ -65,7 +65,7 @@ ModelResource *ModelResource::make(
         mesh->faceCount(),
         utextures);
 
-    Resources::get().registerResource(res);
+    Resources::getInstance().registerResource(res);
     res->addDependency(mesh);
     res->addDependency(program);
     for(const SamplerTexture &st : textures)

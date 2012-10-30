@@ -281,7 +281,7 @@ FontResource *FontResource::load(
     FontResourceImpl *impl = new FontResourceImpl(charmap, texture, program);
 
     FontResource *res = new FontResource(name, impl);
-    Resources::get().registerResource(res);
+    Resources::getInstance().registerResource(res);
     return res;
 }
 

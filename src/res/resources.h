@@ -9,6 +9,57 @@
 using std::string;
 
 /**
+ * Resource loading exception
+ */
+class ResourceException : public std::exception
+{
+public:
+    ResourceException(const string& datafile, const string& resource, const string& error);
+    ~ResourceException() throw();
+
+    /**
+     * Get the datafile related to the error
+     * 
+     * @return data file name
+     */
+    const string& datafile() const { return m_datafile; }
+
+    /**
+     * Get the name of the resource related to the error
+     * 
+     * @return resource name
+     */
+    const string& resource() const { return m_resource; }
+
+    /**
+     * Get the error string
+     * 
+     * @return error string
+     */
+    const string& error() const { return m_error; }
+
+    const char *what() const throw();
+
+    friend std::ostream& operator<<(std::ostream&, const ResourceException&);
+ 
+private:
+    string m_datafile;
+    string m_resource;
+    string m_error;
+};
+
+/**
+ * Resource not found exception.
+ */
+class ResourceNotFound : public ResourceException
+{
+public:
+    ResourceNotFound(const string& datafile, const string& resource)
+    : ResourceException(datafile, resource, "resource \"" + resource + "\" not found!")
+    {}
+};
+
+/**
  * Base class for resource types
  */
 class Resource {
@@ -76,7 +127,24 @@ public:
      * Get the resource manager singleton instance.
      * @return resource manager
      */
-    static Resources &get();
+    static Resources &getInstance();
+
+    /**
+     * Get the named resource of the specific type
+     *
+     * @param name resource name
+     * @return resource
+     * @throw ResourceException if resource is not found or is the wrong type
+     */
+    template <class restype>
+    static restype *get(const string& name)
+    {
+        Resource *res = getInstance().getResource(name);
+        restype *r = dynamic_cast<restype*>(res);
+        if(!r)
+            throw ResourceException("", name, "wrong resource type!");
+        return r;
+    }
 
     /**
      * Register a new resource.
@@ -86,13 +154,20 @@ public:
      */
     void registerResource(Resource *resource);
 
+
     /**
      * Get the named resource
-     *
+     * 
      * @param name resource name
-     * @return resource or nullptr if not found
+     * @return resource
+     * @throw ResourceNotFound if not found
      */
-    Resource *getResource(const string& name);
+    Resource *getResource(const string &name)
+    {
+        if(!m_resources.count(name))
+            throw ResourceNotFound("", name);
+        return m_resources[name];
+    }
 
     /**
      * Remove the named resource.
@@ -105,47 +180,6 @@ private:
     Resources();
 
     std::unordered_map<string, Resource*> m_resources;
-};
-
-class ostream;
-/**
- * Resource loading exception
- */
-class ResourceException : public std::exception
-{
-public:
-    ResourceException(const string& datafile, const string& resource, const string& error);
-    ~ResourceException() throw();
-
-    /**
-     * Get the datafile related to the error
-     * 
-     * @return data file name
-     */
-    const string& datafile() const { return m_datafile; }
-
-    /**
-     * Get the name of the resource related to the error
-     * 
-     * @return resource name
-     */
-    const string& resource() const { return m_resource; }
-
-    /**
-     * Get the error string
-     * 
-     * @return error string
-     */
-    const string& error() const { return m_error; }
-
-    const char *what() const throw();
-
-    friend std::ostream& operator<<(std::ostream&, const ResourceException&);
- 
-private:
-    string m_datafile;
-    string m_resource;
-    string m_error;
 };
 
 #endif

@@ -10,7 +10,7 @@ Resources::Resources()
 {
 }
 
-Resources &Resources::get()
+Resources &Resources::getInstance()
 {
     if(!RESOURCES)
         RESOURCES = new Resources();
@@ -24,13 +24,6 @@ void Resources::registerResource(Resource *resource)
         throw ResourceException("", resource->name(), "named resource already registered");
 
     m_resources[resource->name()] = resource;
-}
-
-Resource *Resources::getResource(const string& name)
-{
-    if(m_resources.count(name))
-        return m_resources[name];
-    return nullptr;
 }
 
 void Resources::unloadResource(const string& name)

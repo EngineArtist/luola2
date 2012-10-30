@@ -24,7 +24,6 @@ void gameloop()
     glfwEnable( GLFW_STICKY_KEYS );
     glFrontFace(GL_CW);
 
-    FontResource *font;
     {
         DataFile df("core.data");
         if(df.isError()) {
@@ -33,8 +32,10 @@ void gameloop()
         }
 
         ResourceLoader rl(df, "resources.yaml");
-        font = static_cast<FontResource*>(rl.load("core.font"));
+        //font = static_cast<FontResource*>(rl.load("core.font.default"));
+        // default font is autoloaded
     }
+    FontResource *font = Resources::get<FontResource>("core.font.default");
 
     ModelResource *ship1, *ship2, *ship3;
     {
@@ -111,7 +112,7 @@ void gameloop()
 
     } while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
 
-    Resources::get().unloadResource("ship.model1");
-    Resources::get().unloadResource("ship.model2");
-    Resources::get().unloadResource("ship.model3");
+    Resources::getInstance().unloadResource("ship.model1");
+    Resources::getInstance().unloadResource("ship.model2");
+    Resources::getInstance().unloadResource("ship.model3");
 }

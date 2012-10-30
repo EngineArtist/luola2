@@ -1,0 +1,30 @@
+autoload: core.font.default
+---
+# STANDARD FONTS
+core.font.default:
+    type: font
+    description: font_impact.xml
+    texture: core.font.texture.font_impact
+    shader: core.font.shader
+
+# TEXTURES
+core.font.texture.font_impact:
+    type: texture
+    src: font_impact.png
+
+# SHADERS FOR FONTS (these can be used for all fonts)
+core.font.shader:
+    type: program
+    shaders:
+        - core.font.shader.vertex
+        - core.font.shader.fragment
+
+core.font.shader.vertex:
+    type: shader
+    subtype: vertex
+    src: font_vertex.glsl
+
+core.font.shader.fragment:
+    type: shader
+    subtype: fragment
+    src: font_fragment.glsl

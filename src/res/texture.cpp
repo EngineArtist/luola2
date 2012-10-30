@@ -45,7 +45,7 @@ TextureResource *TextureResource::load(const string& name, DataFile &datafile, c
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     TextureResource *res = new TextureResource(name, id, img.width, img.height, GL_TEXTURE_2D);
-    Resources::get().registerResource(res);
+    Resources::getInstance().registerResource(res);
 
     return res;
 }

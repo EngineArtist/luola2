@@ -62,7 +62,7 @@ ShaderResource *ShaderResource::load(
 
     // Create resource
     ShaderResource *res = new ShaderResource(name, type, id);
-    Resources::get().registerResource(res);
+    Resources::getInstance().registerResource(res);
 
     return res;
 }
@@ -81,7 +81,7 @@ ProgramResource *ProgramResource::make(const string& name)
 {
     GLuint id = glCreateProgram();
     ProgramResource *res = new ProgramResource(name, id);
-    Resources::get().registerResource(res);
+    Resources::getInstance().registerResource(res);
     return res;
 }
 

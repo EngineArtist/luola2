@@ -1,15 +1,128 @@
 #ifndef LUOLA_RESOURCE_LOADER_H
 #define LUOLA_RESOURCE_LOADER_H
 
-#include <yaml-cpp/node.h>
-
-#include "../fs/datafile.h"
-#include "resources.h"
+#include <memory>
 
 using std::string;
 
+class ResourceLoaderImpl;
+class DataFile;
+class Resource;
+
+/**
+ * Load resources from data files.
+ *
+ * The resource loader takes a YAML resource description file as input.
+ * Resources can then be loaded with the `load(const string&)` function. The
+ * loaded resources will automatically be registered with the resource manager.
+ *
+ * <h1>Description file format</h1>
+ * \verbatim
+include: *list or scalar*  # list of extra resource description files to include
+autoload: *list or scalar* # list of resources to automatically load
+---
+*resouce name*:
+    type: *resource type*
+    *options*
+\endverbatim
+ *
+ * The first document of the description file is a metadata header. It can be
+ * omitted. If used, however, the document separator --- must be used to indicate
+ * the presence of the header!
+ *
+ * <h1>Resource types</h1>
+ * <h2>Program</h2>
+ * A shader program. This generates a ProgramResource.
+ * The attribute "shaders" is a list of shaders to link to the program.
+ *
+ * Example:
+ * \verbatim
+myProgram:
+    type: program
+    shaders:
+        - myVertexShader
+        - myFragmentShader
+\endverbatim
+ *
+ * <h2>Shader</h2>
+ * A shader. This generates a ShaderResource.
+ * The attribute "subtype" must be one of "vertex", "fragment" or "geometry".
+ * The attribute "src" is the name of the file (inside the same resource
+ * data file) from which the shader source code is read.
+ *
+ * Example:
+ * \verbatim
+myVertexShader:
+    type: shader
+    subtype: vertex
+    src: vertex.glsl
+\endverbatim
+ *
+ * <h2>Texture</h2>
+ * This generates a TextureResource.
+ * Currently only 2D textures loaded from PNG files are supported.
+ * The attribute "src" is the name of the texture file.
+ *
+ * Example:
+ * \verbatim
+myTexture:
+    type: texture
+    src: image.png
+\endverbatim
+ *
+ * <h2>Mesh</h2>
+ * 3D vertex data. This generates a MeshResource.
+ * The file format is described in MeshResource's documentation.
+ * The attribute "src" is the name of the mesh data file.
+ *
+ * Example:
+ * \verbatim
+myMesh:
+    type: mesh
+    src: myMeshData.mesh
+\endverbatim
+ *
+ * <h2>Model</h2>
+ * A 3D model. This wraps together a mesh, a shader program and zero or more
+ * textures. A ModelResource is generated.
+ * The attributes "mesh" and "shader" indicate the mesh and shader program to use.
+ * The attribute "textures" is a list of texture references and sampler names.
+ *
+ * Example:
+ * \verbatim
+myModel:
+    type: model
+    mesh: myMesh
+    shader: myProgram
+    textures:
+        -texture: myTexture
+         sampler: tex0
+
+        -texture: mySecondTexture
+         sampler: tex1
+\endverbatim
+ * The "sampler" attribute is the name of the sampler uniform used in the
+ * fragment shader program to which the given texture will be bound.
+ *
+ * <h2>Font</h2>
+ * A bitmap texture font. This generates a FontResource.
+ * The attributes "texture" and "shader" reference the font texture and shader to
+ * use. The attribute "description" names the font description XML file.
+ *
+ * Example:
+ * \verbatim
+myFont:
+    type: font
+    texture: myFontTexture
+    description: font.xml
+    shader: myFontShader
+\endverbatim
+ *
+ */
 class ResourceLoader {
 public:
+    ResourceLoader();
+
     /**
      * Construct a resource loader instance.
      *
@@ -30,15 +143,7 @@ public:
     Resource *load(const string& name);
 
 private:
-    Resource *loadProgram(const string& name);
-    Resource *loadShader(const string& name);
-    Resource *loadTexture(const string& name);
-    Resource *loadMesh(const string& name);
-    Resource *loadModel(const string& name);
-    Resource *loadFont(const string& name);
-
-    DataFile m_datafile;
-    YAML::Node m_resources;
+    std::shared_ptr<ResourceLoaderImpl> m_impl;
 };
 
 #endif

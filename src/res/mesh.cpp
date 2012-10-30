@@ -191,7 +191,7 @@ MeshResource *MeshResource::load(
         vertex.size(),
         triangle.size()
         );
-    Resources::get().registerResource(res);
+    Resources::getInstance().registerResource(res);
     return res;
 }
 

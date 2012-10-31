@@ -87,6 +87,9 @@ namespace {
             return false;
         }
  
+		// Enable v-sync
+		//glfwSwapInterval(1);
+
         glfwSetWindowTitle("Luola 2.0");
         return true;
     }

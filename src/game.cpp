@@ -96,6 +96,20 @@ void gameloop()
             time_accumulator -= Physical::TIMESTEP;
         }
 
+        // Interaction
+        if(glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS) {
+            for(int i=0;i<OBJS;++i)
+                objects[i].addImpulse(glm::vec2(0, 0.2));
+        }
+        if(glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
+            for(int i=0;i<OBJS;++i)
+                objects[i].addImpulse(glm::vec2(-0.2, 0));
+        }
+        if(glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            for(int i=0;i<OBJS;++i)
+                objects[i].addImpulse(glm::vec2(0.2, 0));
+        }
+
         // Graphics
         glClear( GL_COLOR_BUFFER_BIT );
         for(int i=0;i<OBJS;++i) {

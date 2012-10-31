@@ -12,6 +12,20 @@ public:
     static const float TIMESTEP;
 
     /**
+     * Default constructor
+     */
+    Physical();
+
+    /**
+     * Construct a new physical object
+     *
+     * @param pos initial position
+     * @param mass mass
+     * @param radius radius
+     */
+    Physical(const glm::vec2 &pos, float mass, float radius);
+
+    /**
      * Get the position of the object
      *
      * @return position vector
@@ -49,6 +63,16 @@ public:
      * @param force impulse force
      */
     void addImpulse(const glm::vec2 &force) { m_imp += force; }
+
+    /**
+     * Get the impulse accumulator
+     *
+     * The impulse accumulator holds the impulse force
+     * that will be applied to the object at the integration step.
+     *
+     * @return impulse force
+     */
+    const glm::vec2 impulse() const { return m_imp; }
 
     /**
      * Get the mass of the object

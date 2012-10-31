@@ -22,6 +22,7 @@ ship.model3:
 ship.mesh:
     type: mesh
     src: vwing.mesh
+    scale: 0.3
 
 ship.mesh2:
     type: mesh

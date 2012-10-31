@@ -73,13 +73,18 @@ myTexture:
  * <h2>Mesh</h2>
  * 3D vertex data. This generates a MeshResource.
  * The file format is described in MeshResource's documentation.
- * The attribute "src" is the name of the mesh data file.
+ * The attribute "src" is the name of the mesh data file. The
+ * optional attributes "offset" and "scale" can be used to modify the mesh.
+ * They take a vector of 1 or 3 elements which will be applied to the
+ * vertex data when loaded.
  *
  * Example:
  * \verbatim
 myMesh:
     type: mesh
     src: myMeshData.mesh
+    offset: [1, 0, 0]
+    scale: 0.5
 \endverbatim
  *
  * <h2>Model</h2>
@@ -87,6 +92,7 @@ myMesh:
  * textures. A ModelResource is generated.
  * The attributes "mesh" and "shader" indicate the mesh and shader program to use.
  * The attribute "textures" is a list of texture references and sampler names.
+ * The texture list may be omitted if no textures are used.
  *
  * Example:
  * \verbatim

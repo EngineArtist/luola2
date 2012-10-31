@@ -85,6 +85,13 @@ Resource *ResourceLoader::load(const string& name)
     return m_impl->load(name);
 }
 
+/**
+ * Convenience function: Convert a YAML node to a string vector
+ *
+ * The YAML node must be either a Scalar or a List.
+ * If the node is a scalar, a vector with just one
+ * element will be returned.
+ */
 std::vector<string> node2vec(const YAML::Node &node)
 {
     std::vector<string> vec;
@@ -95,6 +102,33 @@ std::vector<string> node2vec(const YAML::Node &node)
             vec.push_back(n.to<string>());
     }
     return vec;
+}
+
+/**
+ * Convenience function: Convert a YAML node to a three component
+ * float vector.
+ *
+ * The YAML node must be either a Scalar or a list.
+ * If the node is a scalar, the same value is assigned to every
+ * component. If the node is a List, its length must be
+ * either 1 or 3.
+ */
+glm::vec3 node2vec3(const YAML::Node &node)
+{
+    if(node.Type() == YAML::NodeType::Scalar) {
+        return glm::vec3(node.to<float>());
+    } else {
+        if(node.size() == 1)
+            return glm::vec3(node[0].to<float>());
+        else if(node.size() == 3)
+            return glm::vec3(
+                node[0].to<float>(),
+                node[1].to<float>(),
+                node[2].to<float>()
+                );
+        else
+            throw ResourceException("", "", "List must have 1 or 3 elements!");
+    }
 }
 
 void ResourceLoaderImpl::parseHeader(const YAML::Node &header)
@@ -271,5 +305,13 @@ Resource *ResourceLoaderImpl::loadMesh(const YAML::Node &node, const string &nam
 {
     string src = node["src"].to<string>();
 
-    return MeshResource::load(name, m_datafile, src);
+    glm::vec3 offset;
+    if(const YAML::Node *offsetnode = node.FindValue("offset"))
+        offset = node2vec3(*offsetnode);
+
+    glm::vec3 scale(1.0f);
+    if(const YAML::Node *scalenode = node.FindValue("scale"))
+        scale = node2vec3(*scalenode);
+
+    return MeshResource::load(name, m_datafile, src, offset, scale);
 }

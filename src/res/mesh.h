@@ -2,6 +2,7 @@
 #define LUOLA_RESOURCE_MESH_H
 
 #include <GL/glfw.h>
+#include <glm/glm.hpp>
 
 #include "resources.h"
 
@@ -38,10 +39,18 @@ public:
      * @param name resource name
      * @param datafile the datafile from which to load the model
      * @param filename model file name (inside datafile)
+     * @param offset offset to apply to each vertex
+     * @param scale scaling factor to apply to each vertex. Scaling is done after offsetting
      * @return new MeshResource
      * @throw ResourceException in case of error
      */
-    static MeshResource *load(const string& name, DataFile &datafile, const string& filename);
+    static MeshResource *load(
+        const string& name,
+        DataFile &datafile,
+        const string& filename,
+        const glm::vec3 &offset,
+        const glm::vec3 &scale
+        );
 
     MeshResource() = delete;
     ~MeshResource();

@@ -23,7 +23,10 @@ using std::string;
 MeshResource *MeshResource::load(
     const string& name,
     DataFile &datafile,
-    const string &filename)
+    const string &filename,
+    const glm::vec3 &offset,
+    const glm::vec3 &scale
+    )
 {
 #ifndef NDEBUG
     cerr << "Loading mesh " << filename << "..." << endl;
@@ -86,11 +89,11 @@ MeshResource *MeshResource::load(
                 break;
 
             case EXPECT_VERTEX:
-                vertex.push_back(glm::vec3(
+                vertex.push_back((glm::vec3(
                     atof(tokens.at(0).c_str()),
                     atof(tokens.at(1).c_str()),
                     atof(tokens.at(2).c_str())
-                    ));
+                    ) + offset) * scale);
                 {
                     int i=3;
                     if(has_normal) {

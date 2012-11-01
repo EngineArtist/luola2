@@ -92,6 +92,13 @@ void gameloop()
                 glm::vec2 vel = objects[i].velocity();
                 bounds(objects[i].position(), vel);
                 objects[i].setVelocity(vel);
+
+                // Object-object collisions
+                for(int j=i+1;j<OBJS;++j) {
+                    if(objects[i].checkCollision(objects[j])) {
+                        std::cout << "collision " << i << "--" << j << std::endl;
+                    }
+                }
             }
             time_accumulator -= Physical::TIMESTEP;
         }

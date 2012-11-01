@@ -1,3 +1,4 @@
+#include <iostream>
 #include "physics.h"
 
 const float Physical::TIMESTEP = 1.0f / 60.0f;
@@ -47,10 +48,10 @@ Physical::Physical(const glm::vec2 &pos, float mass, float radius)
 void Physical::step()
 {
     // Apply impulse and reset accumulator
-    m_vel += m_imp / m_mass;
+    m_vel += m_imp * imass();
     m_imp = glm::vec2();
 
-    // Integrate forces
+    // Integrate forces (RK4)
     Derivate a = evaluate(*this, 0.0f, Derivate());
     Derivate b = evaluate(*this, TIMESTEP*0.5f, a);
     Derivate c = evaluate(*this, TIMESTEP*0.5f, b);
@@ -61,4 +62,38 @@ void Physical::step()
 
     m_pos += dposdt * TIMESTEP;
     m_vel += dveldt * TIMESTEP;
+}
+
+bool Physical::checkCollision(Physical &other)
+{
+    // A collision occurs when distance between
+    // the center of this object and other is <= this radius + other radius.
+    glm::vec2 distv = position() - other.position();
+    float dd = glm::dot(distv, distv);
+    float r = radius() + other.radius();
+    if(dd > r*r)
+        return false;
+
+    // Collision normal vector
+    glm::vec2 normal = glm::normalize(distv);
+
+    // Combined velocity
+    glm::vec2 collv = velocity() - other.velocity();
+    float impact_speed = glm::dot(collv, normal);
+
+    // Check if objects are moving away from each other already
+    if(impact_speed  > 0)
+        return true;
+
+    // Coefficient of restitution
+    const float cor = 0.95f;
+
+    // Collision impulse
+    float j = -(1.0f + cor) * impact_speed / (imass() + other.imass());
+    glm::vec2 impulse = j * normal;
+
+    addImpulse(impulse);
+    other.addImpulse(-impulse);
+
+    return true;
 }

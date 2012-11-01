@@ -58,11 +58,13 @@ public:
     void setVelocity(const glm::vec2 &vel) { m_vel = vel; }
 
     /**
-     * Apply an impulse to this object
+     * Add an impulse to the impulse accumulator.
+     *
+     * The total impulse will be applied on the next simulation step.
      *
      * @param force impulse force
      */
-    void addImpulse(const glm::vec2 &force) { m_imp += force; }
+    void addImpulse(const glm::vec2 &impulse) { m_imp += impulse; }
 
     /**
      * Get the impulse accumulator
@@ -70,7 +72,7 @@ public:
      * The impulse accumulator holds the impulse force
      * that will be applied to the object at the integration step.
      *
-     * @return impulse force
+     * @return accumulated impulse
      */
     const glm::vec2 impulse() const { return m_imp; }
 
@@ -80,6 +82,15 @@ public:
      * @return mass
      */
     float mass() const { return m_mass; }
+
+    /**
+     * Get the mass⁻¹
+     *
+     * This is just a shortcut for certain calculations.
+     *
+     * @return inverse mass
+     */
+    float imass() const { return 1.0f / m_mass; }
 
     /**
      * Change the mass of the object
@@ -111,6 +122,14 @@ public:
      * Simulate a timestep.
      */
     void step();
+
+    /**
+     * Check if this object is currently colliding with the other object.
+     *
+     * @param object the other object to check
+     * @return true if this object is in collision with the other one.
+     */
+    bool checkCollision(Physical &other);
 
 private:
     // Position

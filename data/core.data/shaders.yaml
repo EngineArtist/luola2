@@ -1,0 +1,19 @@
+autoload:
+    - core.shader.terrain
+---
+core.shader.terrain:
+    type: program
+    shaders:
+        - core.shader.terrain.vertex
+        - core.shader.terrain.fragment
+
+core.shader.terrain.vertex:
+    type: shader
+    subtype: vertex
+    src: terrain_vertex.glsl
+
+core.shader.terrain.fragment:
+    type: shader
+    subtype: fragment
+    src: terrain_fragment.glsl
+

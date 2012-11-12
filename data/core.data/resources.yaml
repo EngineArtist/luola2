@@ -1,2 +1,4 @@
-include: fonts.yaml
+include:
+    - fonts.yaml
+    - shaders.yaml
 ---

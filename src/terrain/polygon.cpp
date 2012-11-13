@@ -65,6 +65,56 @@ ConvexPolygon &ConvexPolygon::operator=(ConvexPolygon &&p)
     return *this;
 }
 
+bool ConvexPolygon::circleCollision(const Point &p, float r, const glm::vec2 &v, Point &cp, glm::vec2 &normal) const
+{
+    // constant: how much an object is repositioned off the point of contact
+    static const float SMIDGEN = 0.001f;
+
+    for(int i=0;i<vertexCount();++i) {
+        // Check if the circle is moving away from the edge
+        const glm::vec2 &n = m_normals[i];
+        if(glm::dot(v, n) >= 0)
+            continue;
+
+        // Leading point on the circle
+        Point lead = n * r;
+        Point lp0 = p - lead;
+
+        // lp0 - lp1 form the line to test
+        Point lp1 = lp0 + v;
+
+        // Check if circle will collide with the edge during this timestep
+        const Point &e0 = vertex(i);
+        Point icp;
+        if(algorithm::lineIntersection(e0, vertex(i+1), lp0, lp1, icp)) {
+            // Intersection!
+            cp = icp + lead + (n * SMIDGEN);
+            normal = n;
+            return true;
+        }
+
+        // Check if circle will collide with the corner in this timestep
+        glm::vec2 w = vertex(i) - p;
+        float ww = glm::dot(w, w);
+        float a = glm::dot(v, v);
+        float b = glm::dot(w, v);
+        float c = ww - r*r;
+
+        float root = b*b - a*c;
+        if(root >= 0) {
+            float t = (-b - glm::sqrt(root)) / a;
+            if(t >= 0 && t <= 1) {
+                cp = p - v * t - (n * SMIDGEN);
+                normal = n;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
 // Separating Axis Theorem tests
 namespace {
     void project_polygon(const ConvexPolygon &polygon, const glm::vec2 &axis, float &min, float &max)
@@ -389,7 +439,7 @@ void ConvexPolygon::toTriangles(Points &points) const
         points.push_back(m_points[i]);
 
         // normal
-#if 0
+#if 1
         Point halfp = (m_points[i] - m_points[i-1]) * Point(0.5, 0.5);
         Point np = m_points[i-1] + halfp;
         points.push_back(np);
@@ -399,7 +449,7 @@ void ConvexPolygon::toTriangles(Points &points) const
     points.push_back(m_points.back());
     points.push_back(m_points[0]);
 
-#if 0
+#if 1
     Point halfp = (m_points.back() - m_points[0]) * Point(0.5, 0.5);
     Point np = m_points[0] + halfp;
     points.push_back(np);

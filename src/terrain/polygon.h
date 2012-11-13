@@ -46,6 +46,22 @@ namespace terrain {
      static void make(const Points &points, std::vector<ConvexPolygon> &polys);
 
      /**
+      * Check for a collision with a moving circle.
+      *
+      * If a collision is detected, true is returned
+      * and the parameters cp and normal will be set
+      * to the point of collision and edge normal.
+      *
+      * @param p circle center point
+      * @param r circle radius
+      * @param v circle displacement in this timestep
+      * @param cp circle's center point at collision
+      * @param normal normal of the colliding edge
+      * @return true if collision happens
+      */
+     bool circleCollision(const Point &p, float r, const glm::vec2 &v, Point &cp, glm::vec2 &normal) const;
+
+     /**
       * Check if the given point is inside the polygon.
       *
       * @param point point coordinates

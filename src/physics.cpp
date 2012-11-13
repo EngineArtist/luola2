@@ -1,5 +1,7 @@
 #include <iostream>
+
 #include "physics.h"
+#include "terrain/terrain.h"
 
 const float Physical::TIMESTEP = 1.0f / 60.0f;
 
@@ -45,7 +47,7 @@ Physical::Physical(const glm::vec2 &pos, float mass, float radius)
 {
 }
 
-void Physical::step()
+void Physical::step(const terrain::Terrain &terrain)
 {
     // Apply impulse and reset accumulator
     m_vel += m_imp * imass();
@@ -60,8 +62,24 @@ void Physical::step()
     const glm::vec2 dposdt = 1.0f/6.0f * (a.dpos + 2.0f*(b.dpos + c.dpos) + d.dpos);
     const glm::vec2 dveldt = 1.0f/6.0f * (a.dvel + 2.0f*(b.dvel + c.dvel) + d.dvel);
 
-    m_pos += dposdt * TIMESTEP;
+    // Position and velocity steps
+    glm::vec2 dpos = dposdt * TIMESTEP;
     m_vel += dveldt * TIMESTEP;
+
+    // Check for terrain collisions
+    terrain::Point cp;
+    glm::vec2 cnorm;
+    if(terrain.circleCollision(m_pos, m_radius, dpos, cp, cnorm)) {
+        // Collision detected!
+        std::cerr << "terrain collision (" << m_pos.x << "," << m_pos.y << ") detected at " << cp.x << ", " << cp.y << " [" << cnorm.x << "," << cnorm.y << "]" << std::endl;
+        m_pos = cp;
+        m_vel = glm::vec2(0, 0.01);
+        //m_vel = glm::reflect(m_vel, cnorm);
+
+    } else {
+        // No collisions, apply position step normally
+        m_pos += dposdt * TIMESTEP;
+    }
 }
 
 bool Physical::checkCollision(Physical &other)

@@ -93,11 +93,12 @@ void gameloop()
     std::default_random_engine generator;
     std::uniform_real_distribution<float> rand(-1.0,1.0);
 
-    static const int OBJS = 3;
+    static const int OBJS = 1;
     Physical objects[OBJS];
     for(int i=0;i<OBJS;++i) {
         objects[i].setPosition(glm::vec2(rand(generator), rand(generator)));
         objects[i].setVelocity(glm::vec2(rand(generator), rand(generator)) * 20.0f);
+        objects[i].setRadius(0.2);
     }
 
     glm::mat4 proj = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -129,7 +130,7 @@ void gameloop()
         // Physics
         while(time_accumulator >= Physical::TIMESTEP) {
             for(int i=0;i<OBJS;++i) {
-                objects[i].step();
+                objects[i].step(terrain);
 
                 // Boundary collisions
                 glm::vec2 vel = objects[i].velocity();

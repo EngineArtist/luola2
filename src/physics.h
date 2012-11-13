@@ -3,6 +3,9 @@
 
 #include <glm/glm.hpp>
 
+// TODO testing
+namespace terrain { class Terrain; }
+
 /**
  * A physical object.
  */
@@ -120,8 +123,10 @@ public:
 
     /**
      * Simulate a timestep.
+     *
+     * TODO: check against world
      */
-    void step();
+    void step(const terrain::Terrain &terrain);
 
     /**
      * Check if this object is currently colliding with the other object.

@@ -47,6 +47,21 @@ public:
      */
     void draw(const glm::mat4 &transform) const;
 
+    /**
+     * Check for a collision with a moving circle.
+     *
+     * If a collision is detected, true is returned
+     * and the parameter cp and normal will be set.
+     *
+     * @param p circle center point
+     * @param r circle radius
+     * @param v circle displacement in this timestep
+     * @param cp circle's center point at collision
+     * @param normal normal of the colliding edge
+     * @return true if collision happens
+     */
+    bool circleCollision(const Point &p, float r, const glm::vec2 &v, Point &cp, glm::vec2 &normal) const;
+
 private:
     void updateGl() const;
 

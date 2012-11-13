@@ -273,7 +273,7 @@ void ConvexPolygon::booleanDifference(const ConvexPolygon &hole, std::vector<Con
     queue.push(0);
 
     // Perform intersection
-    int added = 0;
+    unsigned int oldsize = list.size();
     Points poly;
     while(!queue.empty()) {
         int i = queue.front();
@@ -345,16 +345,17 @@ void ConvexPolygon::booleanDifference(const ConvexPolygon &hole, std::vector<Con
         if(poly.size() >= 3) {
             try {
                 ConvexPolygon::make(poly, list);
-                ++added;
             } catch(const algorithm::GeometryException &e) {
                 // Bad polygons generated... The algorithm works well
                 // enough most of the time, let's just roll back the error.
+                int changes = list.size() - oldsize;
 #ifndef NDEBUG
-                cerr << "Geometry error: " << e.what() << " (" << added << " change(s) rolled back)\n";
+                cerr << "booleanDifference error: " << e.what() << " (" << changes << " change(s) rolled back)\n";
 #endif
-                while(added-->0)
+                while(changes-->0)
                     list.pop_back();
                 list.push_back(*this);
+                return;
             }
         }
         poly.clear();

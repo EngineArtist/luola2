@@ -129,6 +129,20 @@ void gameloop()
 
         // Physics
         while(time_accumulator >= Physical::TIMESTEP) {
+            // Interaction
+            if(glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS) {
+                for(int i=0;i<OBJS;++i)
+                    objects[i].addImpulse(glm::vec2(0, 1.0));
+            }
+            if(glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
+                for(int i=0;i<OBJS;++i)
+                    objects[i].addImpulse(glm::vec2(-1.0, 0));
+            }
+            if(glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                for(int i=0;i<OBJS;++i)
+                    objects[i].addImpulse(glm::vec2(1.0, 0));
+            }
+
             for(int i=0;i<OBJS;++i) {
                 objects[i].step(terrain);
 
@@ -145,20 +159,6 @@ void gameloop()
                 }
             }
             time_accumulator -= Physical::TIMESTEP;
-        }
-
-        // Interaction
-        if(glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS) {
-            for(int i=0;i<OBJS;++i)
-                objects[i].addImpulse(glm::vec2(0, 0.2));
-        }
-        if(glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
-            for(int i=0;i<OBJS;++i)
-                objects[i].addImpulse(glm::vec2(-0.2, 0));
-        }
-        if(glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            for(int i=0;i<OBJS;++i)
-                objects[i].addImpulse(glm::vec2(0.2, 0));
         }
 
         if(glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {

@@ -24,8 +24,25 @@ public:
      */
     float thrust() const { return m_thrust; }
 
+    /**
+     * Get the amount of energy the engine consumes while thrusting.
+     *
+     * The value is premultiplied with the physics timestep.
+     * @return thrust power consumption
+     */
+    float thrustEnergy() const { return m_thrustenergy; }
+
+    /**
+     * Get the amount of energy the engine consumes while idling.
+     * 
+     * The values is premultiplied with the physics timestep.
+     * @return idle power consumption
+     */
+    float idleEnergy() const { return m_idle; }
+ 
 private:
     float m_thrust;
+    float m_thrustenergy, m_idle;
 };
 
 class Engines {

@@ -8,6 +8,7 @@ void World::step()
     for(unsigned int i=0;i<m_ships.size();++i) {
         Physical &obj = m_ships[i]->physics();
 
+        m_ships[i]->shipStep();
         obj.step(*this);
 
         // Boundary collisions

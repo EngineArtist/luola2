@@ -1,3 +1,5 @@
 rocket:
     thrust: 70
+    energy: 10
+    idle: 0
 

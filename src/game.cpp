@@ -16,6 +16,7 @@
 #include "ship/shipdef.h"
 #include "ship/ship.h"
 #include "ship/engine.h"
+#include "ship/power.h"
 #include "renderer.h"
 
 void bounds(const glm::vec2 pos, glm::vec2 &vel) {
@@ -79,6 +80,7 @@ void gameloop()
     {
         DataFile df("game.data");
         Engines::loadAll(df, "engines.yaml");
+        PowerPlants::loadAll(df, "power.yaml");
     }
 
     ShipDefs::load("test");
@@ -86,7 +88,7 @@ void gameloop()
     World world;
     Renderer renderer(world);
 
-    Ship *ship = new Ship(ShipDefs::get("test"), Engines::get("rocket"));
+    Ship *ship = new Ship(ShipDefs::get("test"), Engines::get("rocket"), PowerPlants::get("fission"));
     world.addShip(ship);
 
     double time_now = glfwGetTime();
@@ -107,15 +109,14 @@ void gameloop()
         // Physics
         while(time_accumulator >= Physical::TIMESTEP) {
             // Interaction
-            if(glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS) {
-                ship->thrust();
-            }
-            if(glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS) {
-                ship->turn(false);
-            }
-            if(glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS) {
-                ship->turn(true);
-            }
+            ship->thrust(glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS);
+
+            if(glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS)
+                ship->turn(Ship::CCW);
+            else if(glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS)
+                ship->turn(Ship::CW);
+            else
+                ship->turn(Ship::NOTURN);
 
             world.step();
             time_accumulator -= Physical::TIMESTEP;

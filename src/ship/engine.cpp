@@ -12,6 +12,8 @@ namespace {
 Engine::Engine(const YAML::Node &node)
 {
     m_thrust = node["thrust"].to<float>() * Physical::TIMESTEP;
+    m_thrustenergy = node["energy"].to<float>() * Physical::TIMESTEP;
+    m_idle = node["idle"].to<float>() * Physical::TIMESTEP;
 }
 
 Engines &Engines::getInstance()

@@ -24,6 +24,15 @@ Terrain::~Terrain()
     glDeleteBuffers(1, &m_vbuffer);
 }
 
+bool Terrain::hasPoint(const Point &p) const
+{
+    for(const ConvexPolygon &poly : m_polygons) {
+        if(poly.hasPoint(p))
+            return true;
+    }
+    return false;
+}
+
 bool Terrain::circleCollision(const Point &p, float r, const glm::vec2 &v, Point &cp, glm::vec2 &normal) const
 {
     for(const ConvexPolygon &poly : m_polygons) {

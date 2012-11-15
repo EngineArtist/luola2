@@ -1,42 +1,21 @@
-ship.model1:
+ship.test.model:
     type: model
-    mesh: ship.mesh
-    shader: ship.shader
+    mesh: ship.test.mesh
+    shader: ship.test.shader
     textures:
         - sampler: myTextureSampler
-          texture: ship.texture
+          texture: ship.test.texture
 
-ship.model2:
-    type: model
-    mesh: ship.mesh
-    shader: ship.shader
-    textures:
-        - sampler: myTextureSampler
-          texture: ship.texture2
-
-ship.model3:
-    type: model
-    mesh: ship.mesh2
-    shader: ship.shader2
-
-ship.mesh:
+ship.test.mesh:
     type: mesh
     src: vwing.mesh
     scale: 0.3
 
-ship.mesh2:
-    type: mesh
-    src: awing.mesh
-
-ship.texture:
+ship.test.texture:
     type: texture
     src: texture.png
 
-ship.texture2:
-    type: texture
-    src: test.png
-
-ship.shader:
+ship.test.shader:
     type: program
     shaders:
         - ship.vs
@@ -52,18 +31,3 @@ ship.fs:
     subtype: fragment
     src: fragment.shader
 
-ship.shader2:
-    type: program
-    shaders:
-        - ship.vs2
-        - ship.fs2
-
-ship.vs2:
-    type: shader
-    subtype: vertex
-    src: vertex2.shader
-
-ship.fs2:
-    type: shader
-    subtype: fragment
-    src: fragment2.shader

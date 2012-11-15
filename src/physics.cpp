@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "physics.h"
-#include "terrain/terrain.h"
+#include "world.h"
 
 const float Physical::TIMESTEP = 1.0f / 60.0f;
 
@@ -47,7 +47,7 @@ Physical::Physical(const glm::vec2 &pos, float mass, float radius)
 {
 }
 
-void Physical::step(const terrain::Terrain &terrain)
+void Physical::step(const World &world)
 {
     // Apply impulse and reset accumulator
     m_vel += m_imp * imass();
@@ -69,7 +69,7 @@ void Physical::step(const terrain::Terrain &terrain)
     // Check for terrain collisions
     terrain::Point cp;
     glm::vec2 cnorm;
-    if(terrain.circleCollision(m_pos, m_radius, dpos, cp, cnorm)) {
+    if(world.checkTerrainCollision(m_pos, m_radius, dpos, cp, cnorm)) {
         // Collision detected!
         std::cerr << "terrain collision (" << m_pos.x << "," << m_pos.y << ") detected at " << cp.x << ", " << cp.y << " [" << cnorm.x << "," << cnorm.y << "]" << std::endl;
         m_pos = cp;

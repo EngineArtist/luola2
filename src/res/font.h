@@ -12,6 +12,7 @@ using std::string;
 
 class FontResourceImpl;
 class FontResource;
+class DataFile;
 
 /**
  * Helper class for setting text rendering settings

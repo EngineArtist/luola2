@@ -18,7 +18,7 @@ class Terrain {
 public:
     Terrain() = delete;
     Terrain(const Terrain&) = delete;
-    Terrain(const std::vector<ConvexPolygon> &polygons);
+    explicit Terrain(const std::vector<ConvexPolygon> &polygons);
     ~Terrain();
 
     /**
@@ -46,6 +46,14 @@ public:
      * @param transform transformation matrix
      */
     void draw(const glm::mat4 &transform) const;
+
+    /**
+     * Check if the given point is inside this terrain block.
+     *
+     * @param p the point to check
+     * @return true if the point is in any of the subpolygons of this block
+     */
+    bool hasPoint(const Point &p) const;
 
     /**
      * Check for a collision with a moving circle.

@@ -50,6 +50,8 @@ namespace conftree {
     public:
         ListNode() : NodeImpl(Node::LIST) { }
 
+        unsigned int items() const { return m_nodes.size(); }
+
         const Node &at(unsigned int i) const
         {
             if(i >= m_nodes.size())
@@ -71,6 +73,8 @@ namespace conftree {
     class MapNode : public NodeImpl {
     public:
         MapNode() : NodeImpl(Node::MAP) { }
+
+        unsigned int items() const { return m_map.size(); }
 
         const Node &at(const string &key) const
         {
@@ -202,7 +206,7 @@ namespace conftree {
     void Node::push_back(const Node &node)
     {
         if(!m_impl)
-            throw BadNode("Cannot append to a blank node!");
+            m_impl = std::shared_ptr<NodeImpl>(new ListNode());
 
         m_impl->push_back(node);
     }
@@ -210,7 +214,7 @@ namespace conftree {
     void Node::insert(const string &key, const Node &node)
     {
         if(!m_impl)
-            throw BadNode("Cannot insert to a blank node!");
+            m_impl = std::shared_ptr<NodeImpl>(new MapNode());
 
         m_impl->insert(key, node);
     }

@@ -1,18 +1,17 @@
 #ifndef LUOLA_RESOURCE_LOADER_H
 #define LUOLA_RESOURCE_LOADER_H
 
-#include <memory>
+#include "../fs/datafile.h"
+#include "../util/conftree.h"
 
 using std::string;
 
-class ResourceLoaderImpl;
-class DataFile;
 class Resource;
 
 /**
  * Load resources from data files.
  *
- * The resource loader takes a YAML resource description file as input.
+ * The resource loader takes a conftree resource description file as input.
  * Resources can then be loaded with the `load(const string&)` function. The
  * loaded resources will automatically be registered with the resource manager.
  *
@@ -149,7 +148,17 @@ public:
     Resource *load(const string& name);
 
 private:
-    std::shared_ptr<ResourceLoaderImpl> m_impl;
+    void parseHeader(DataFile&, const conftree::Node&);
+
+    conftree::Node m_node;
+    DataFile m_datafile;
+
+    Resource *loadProgram(const conftree::Node &node, const string &name);
+    Resource *loadShader(const conftree::Node &node, const string &name);
+    Resource *loadTexture(const conftree::Node &node, const string &name);
+    Resource *loadMesh(const conftree::Node &node, const string &name);
+    Resource *loadModel(const conftree::Node &node, const string &name);
+    Resource *loadFont(const conftree::Node &node, const string &name);
 };
 
 #endif

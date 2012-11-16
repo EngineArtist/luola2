@@ -4,6 +4,7 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <vector>
 #include <set>
 
 using std::string;
@@ -135,7 +136,7 @@ public:
      * Note. Do not make cyclic node graphs! Doing so will cause
      * a memory leak.
      * @param node node to append
-     * @throws BadNode if this is not a LIST node
+     * @throws BadNode if this is not a LIST or BLANK node
      */
     void push_back(const Node &node);
 
@@ -146,7 +147,7 @@ public:
      * a memory leak.
      * @param key node key
      * @param node new node
-     * @throws BadNdoe if this is not a MAP node
+     * @throws BadNdoe if this is not a MAP or BLANK node
      */
     void insert(const string &key, const Node &node);
 
@@ -157,12 +158,24 @@ private:
 /**
  * Read the given YAML file from the datafile and
  * return it as a tree of configuration nodes.
+ *
+ * Only the first document of the YAML file is returned.
  * 
  * @param datafile the data file
  * @param filename the YAML file inside the datafile
  * @return Configuration tree
  */
 Node parseYAML(DataFile &datafile, const string &filename);
+
+/**
+ * Read the given YAML file from the datafile
+ * and return all of its documents as configuration nodes.
+ *
+ * @param datafile the data file
+ * @param filename the YAML file inside the data file
+ * @return forest of configuration trees
+ */
+std::vector<Node> parseMultiDocYAML(DataFile &datafile, const string &filename);
 
 /**
  * Configuration tree exception

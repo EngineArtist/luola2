@@ -42,7 +42,7 @@ MeshResource *MeshResource::load(
         EXPECT_TRIANGLE_HEADER,
         EXPECT_TRIANGLE,
         DONE
-        } state ;
+        } state = EXPECT_VERTEX_HEADER;
     int expecting = 0;
     bool has_normal = false;
     bool has_uv = false;

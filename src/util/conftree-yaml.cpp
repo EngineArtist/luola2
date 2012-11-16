@@ -39,6 +39,7 @@ namespace {
         return Node();
     }
 }
+
 Node parseYAML(DataFile &datafile, const string &filename)
 {
     DataStream ds(datafile, filename);
@@ -51,6 +52,23 @@ Node parseYAML(DataFile &datafile, const string &filename)
         throw BadNode(filename + ": not a YAML file!");
 
     return asNode(*doc);
+}
+
+std::vector<Node> parseMultiDocYAML(DataFile &datafile, const string &filename)
+{
+    DataStream ds(datafile, filename);
+    if(ds->isError())
+        throw BadNode("Unable to open configuration file: " + filename);
+
+    YAML::Parser parser(ds);
+
+    std::vector<Node> nodes;
+    std::unique_ptr<YAML::Node> doc(new YAML::Node());
+    while(parser.GetNextDocument(*doc)) {
+        nodes.push_back(asNode(*doc));
+    }
+
+    return nodes;
 }
 
 }

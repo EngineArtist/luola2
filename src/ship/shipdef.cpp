@@ -4,36 +4,27 @@ using std::cerr;
 using std::endl;
 #endif
 
-#include <yaml-cpp/yaml.h>
+#include <stdexcept>
 
 #include "../fs/datafile.h"
+#include "../util/conftree.h"
 #include "../res/loader.h"
 #include "../res/model.h"
 
 #include "exception.h"
 #include "shipdef.h"
 
-namespace {
-    string optValue(const YAML::Node &node, const char *key, const string &def)
-    {
-        const YAML::Node *n = node.FindValue(key);
-        if(n)
-            return n->to<string>();
-        return def;
-    }
-}
-
-ShipDef::ShipDef(ResourceLoader &resloader, const YAML::Node &doc)
+ShipDef::ShipDef(ResourceLoader &resloader, const conftree::Node &doc)
 {
-    doc["shortname"] >> m_shortname;
-    m_fullname = optValue(doc, "fullname", m_shortname);
+    m_shortname = doc.at("shortname").value();
+    m_fullname = doc.opt("fullname").value(m_shortname);
 
-    doc["mass"] >> m_mass;
-    doc["radius"] >> m_radius;
+    m_mass = doc.at("mass").floatValue();
+    m_radius = doc.at("radius").floatValue();
 
-    m_turnrate = glm::radians(doc["turningrate"].to<float>());
+    m_turnrate = glm::radians(doc.at("turningrate").floatValue());
 
-    string model = doc["model"].to<string>();
+    string model = doc.at("model").value();
     m_model = dynamic_cast<ModelResource*>(resloader.load(model));
     if(!m_model)
         throw ShipDefException("unable to load model " + model);
@@ -73,21 +64,8 @@ void ShipDefs::load(const string &shipname)
     ResourceLoader rl(df, "resources.yaml");
 
     // Load ship definition file
-    std::unique_ptr<YAML::Node> def(new YAML::Node());
-    {
-        DataStream ds(df, "ship.yaml");
-        if(ds->isError())
-            throw ShipDefException(shipname + ": error reading ship.yaml!");
-
-        YAML::Parser parser(ds);
-        if(!parser.GetNextDocument(*def))
-            throw ShipDefException(shipname + ": ship.yaml is not a YAML file!");
-
-        if(def->Type() != YAML::NodeType::Map)
-            throw ShipDefException(shipname + ": ship.yaml should contain a Map!");
-    }
-
-    ShipDef *shipdef = new ShipDef(rl, *def);
+    conftree::Node def = conftree::parseYAML(df, "ship.yaml");
+    ShipDef *shipdef = new ShipDef(rl, def);
 
     shipdefs.m_shipdefs[shipname] = shipdef;
 }

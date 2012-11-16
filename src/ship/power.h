@@ -6,14 +6,14 @@
 
 using std::string;
 
-namespace YAML { class Node; }
+namespace conftree { class Node; }
 class DataFile;
 /**
  * Ship power source definition
  */
 class PowerPlant {
 public:
-    PowerPlant(const YAML::Node &node);
+    PowerPlant(const conftree::Node &node);
 
     /**
      * Get the amount of energy generated per second

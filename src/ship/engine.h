@@ -6,7 +6,7 @@
 
 using std::string;
 
-namespace YAML { class Node; }
+namespace conftree { class Node; }
 class DataFile;
 
 /**
@@ -14,7 +14,7 @@ class DataFile;
  */
 class Engine {
 public:
-    Engine(const YAML::Node &node);
+    Engine(const conftree::Node &node);
 
     /**
      * Get the thrusting power

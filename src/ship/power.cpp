@@ -1,6 +1,6 @@
-#include <yaml-cpp/yaml.h>
+#include <stdexcept>
 
-#include "../fs/datafile.h"
+#include "../util/conftree.h"
 #include "../physics.h"
 #include "exception.h"
 #include "power.h"
@@ -9,9 +9,9 @@ namespace {
     PowerPlants *POWERPLANTS;
 }
 
-PowerPlant::PowerPlant(const YAML::Node &node)
+PowerPlant::PowerPlant(const conftree::Node &node)
 {
-    m_energy = node["energy"].to<float>() * Physical::TIMESTEP;
+    m_energy = node.at("energy").floatValue() * Physical::TIMESTEP;
 }
 
 PowerPlants &PowerPlants::getInstance()
@@ -23,24 +23,11 @@ PowerPlants &PowerPlants::getInstance()
 
 void PowerPlants::loadAll(DataFile &df, const string &filename)
 {
+    conftree::Node node = conftree::parseYAML(df, filename);
+
     PowerPlants &pp = getInstance();
-
-    DataStream ds(df, filename);
-    if(ds->isError())
-        throw ShipDefException("error reading power plant definition file " + filename);
-
-    std::unique_ptr<YAML::Node> defs(new YAML::Node());
-    YAML::Parser parser(ds);
-    if(!parser.GetNextDocument(*defs))
-        throw ShipDefException(filename + ": error reading YAML file!");
-
-    if(defs->Type() != YAML::NodeType::Map)
-        throw ShipDefException(filename + ": not a Map!");
-
-    for(YAML::Iterator it=defs->begin();it!=defs->end();++it) {
-        string name = it.first().to<string>();
-        pp.m_pplants[name] = new PowerPlant(it.second());
-    }
+    for(const string &key : node.itemSet())
+        pp.m_pplants[key] = new PowerPlant(node.at(key));
 }
 
 const PowerPlant &PowerPlants::get(const string &name)

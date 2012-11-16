@@ -7,7 +7,7 @@
 class ModelResource;
 class ResourceLoader;
 
-namespace YAML { class Node; }
+namespace conftree { class Node; }
 
 /**
  * Ship definition.
@@ -23,7 +23,7 @@ public:
      * @param resloader the resource loader with which to load dependencies
      * @param doc configuration file root node
      */
-    ShipDef(ResourceLoader &resloader, const YAML::Node &doc);
+    ShipDef(ResourceLoader &resloader, const conftree::Node &doc);
 
     /**
      * Get the short (player visible) name of the ship.

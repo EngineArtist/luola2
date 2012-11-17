@@ -1,12 +1,14 @@
 #ifndef LUOLA_SHIP_H
 #define LUOLA_SHIP_H
 
+#include <vector>
 #include "../physics.h"
 
 class ModelResource;
 class ShipDef;
 class Engine;
 class PowerPlant;
+class Equipment;
 
 class Ship {
 public:
@@ -16,7 +18,11 @@ public:
      * @param def ship definition
      * @param engine ship engine
      */
-    Ship(const ShipDef &def, const Engine &engine, const PowerPlant &power);
+    Ship(const ShipDef &def,
+         const Engine &engine,
+         const PowerPlant &power,
+         const std::vector<const Equipment*> &equipment
+        );
 
     /**
      * Get the physics object of the ship
@@ -24,6 +30,14 @@ public:
      */
     Physical &physics() { return m_physics; }
     const Physical &physics() const { return m_physics; }
+
+    /**
+     * Add a battery to the ship
+     *
+     * @param capacity battery capacity
+     * @param chargerate battery charge rate
+     */
+    void addBattery(float capacity, float chargerate);
 
     /**
      * Draw the ship

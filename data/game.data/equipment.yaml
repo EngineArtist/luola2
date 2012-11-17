@@ -1,0 +1,4 @@
+capacitor:
+    codebase: statmodifier
+    battery: 20
+    chargerate: 10

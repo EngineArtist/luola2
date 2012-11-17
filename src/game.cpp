@@ -17,6 +17,7 @@
 #include "ship/ship.h"
 #include "ship/engine.h"
 #include "ship/power.h"
+#include "equipment/equipment.h"
 #include "renderer.h"
 
 void bounds(const glm::vec2 pos, glm::vec2 &vel) {
@@ -81,6 +82,7 @@ void gameloop()
         DataFile df("game.data");
         Engines::loadAll(df, "engines.yaml");
         PowerPlants::loadAll(df, "power.yaml");
+        Equipments::loadAll(df, "equipment.yaml");
     }
 
     ShipDefs::load("test");
@@ -88,7 +90,16 @@ void gameloop()
     World world;
     Renderer renderer(world);
 
-    Ship *ship = new Ship(ShipDefs::get("test"), Engines::get("rocket"), PowerPlants::get("fission"));
+    Ship *ship;
+    {
+        std::vector<const Equipment*> eq;
+        eq.push_back(Equipments::get("capacitor"));
+        ship = new Ship(ShipDefs::get("test"),
+                        Engines::get("rocket"),
+                        PowerPlants::get("fission"),
+                        eq
+                       );
+    }
     world.addShip(ship);
 
     double time_now = glfwGetTime();

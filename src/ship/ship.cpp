@@ -7,25 +7,44 @@
 #include "ship.h"
 #include "engine.h"
 #include "power.h"
+#include "../equipment/equipment.h"
 
-Ship::Ship(const ShipDef &def, const Engine &engine, const PowerPlant &power)
+Ship::Ship(const ShipDef &def,
+           const Engine &engine,
+           const PowerPlant &power,
+           const std::vector<const Equipment*> &equipment
+          )
     : m_turnrate(def.turningRate() * Physical::TIMESTEP),
       m_engine(engine),
       m_power(power),
       m_model(def.model())
 {
+    // Set physical properties
     m_physics.setRadius(def.radius());
     m_physics.setMass(def.mass());
     m_physics.setPosition(glm::vec2(0, 0));
     m_physics.setVelocity(glm::vec2(0, 1));
 
+    // Battery
     m_battery = 0.0f;
     m_battery_charge_rate = 0.0f;
 
+    // Add equipment
+    for(const Equipment *eq : equipment) {
+        eq->applyModification(*this);
+    }
+
+    // Calculate cached values
     m_maxenergy = power.energy() / Physical::TIMESTEP + m_battery;
     m_energy = m_maxenergy;
 
     setAngle(0.0f);
+}
+
+void Ship::addBattery(float capacity, float chargerate)
+{
+    m_battery += capacity;
+    m_battery_charge_rate = (m_battery_charge_rate + chargerate) / 2.0f;
 }
 
 void Ship::draw(const glm::mat4 &transform) const

@@ -44,9 +44,13 @@ public:
     /**
      * Add a new ship to the world.
      *
+     * @param player the player to whom the ship belongs to
      * @param ship the ship to add
      */
-    void addShip(Ship *ship);
+    void addShip(int player, Ship *ship);
+
+    // TODO
+    Ship *getPlayerShip(int player);
 
     /**
      * Add a new zone to the world.

@@ -58,10 +58,17 @@ bool World::checkTerrainCollision(const terrain::Point &p, float r, const glm::v
     return false;
 }
 
-void World::addShip(Ship *ship)
+void World::addShip(int player, Ship *ship)
 {
     assert(ship);
+    assert(player > 0);
     m_ships.push_back(ship);
+}
+
+Ship *World::getPlayerShip(int player)
+{
+    // TODO
+    return m_ships[0];
 }
 
 void World::addZone(terrain::Zone *zone)

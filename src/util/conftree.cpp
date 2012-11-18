@@ -19,7 +19,7 @@ namespace conftree {
         virtual unsigned int items() const { return 0; }
         virtual const Node &at(unsigned int) const { throw BadNode("not a LIST node!"); }
         virtual const Node &at(const string &) const { throw BadNode("not a MAP node!"); }
-        virtual const Node &at(const string &, const Node&) const { throw BadNode("not a MAP node!"); }
+        virtual bool hasNode(const string &) const { return false; }
         virtual std::set<string> itemSet() const { throw BadNode("nto a MAP node!"); }
         virtual void push_back(const Node&) { throw BadNode("not a LIST node!"); }
         virtual void insert(const string&, const Node&) { throw BadNode("not a MAP node!"); }
@@ -76,21 +76,16 @@ namespace conftree {
 
         unsigned int items() const { return m_map.size(); }
 
+        bool hasNode(const string &key) const {
+            return m_map.count(key) > 0;
+        }
+ 
         const Node &at(const string &key) const
         {
             try {
                 return m_map.at(key);
             } catch(const std::out_of_range &ex) {
                 throw BadNode("No such item: " + key);
-            }
-        }
-
-        const Node &at(const string &key, const Node &def) const
-        {
-            try {
-                return m_map.at(key);
-            } catch(const std::out_of_range &ex) {
-                return def;
             }
         }
 
@@ -192,7 +187,17 @@ namespace conftree {
         if(!m_impl)
             return def;
 
-        return m_impl->at(name, def);
+        if(m_impl->hasNode(name))
+            return m_impl->at(name);
+        return def;
+    }
+
+    bool Node::hasNode(const string &name) const
+    {
+        if(!m_impl)
+            return false;
+
+        return m_impl->hasNode(name);
     }
 
     std::set<string> Node::itemSet() const

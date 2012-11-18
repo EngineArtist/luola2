@@ -1,0 +1,9 @@
+# Sample quicklaunch file
+
+player1:
+    hull: test
+    power: fission
+    engine: rocket
+    equipment:
+        - capacitor
+    position: [0, 3]

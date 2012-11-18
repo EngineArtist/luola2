@@ -12,6 +12,7 @@
 
 #include "physics.h"
 #include "game.h"
+#include "launcher.h"
 #include "world.h"
 #include "ship/shipdef.h"
 #include "ship/ship.h"
@@ -25,26 +26,6 @@ void bounds(const glm::vec2 pos, glm::vec2 &vel) {
         vel.x = -vel.x;
     if(pos.y<-7.5 || pos.y>7.5)
         vel.y = -vel.y;
-}
-
-terrain::Solid *makeTerrain()
-{
-    using namespace terrain;
-    std::vector<ConvexPolygon> polys;
-    std::vector<Point> points;
-#if 1
-    for(int i=0;i<6;++i) {
-        points.push_back(Point(cos(i/6.0 * M_PI * 2) * 3, sin(i/6.0 * M_PI * 2) * 3));
-        std::cerr << points[points.size()-1].x << ", " << points[points.size()-1].y << std::endl;
-    }
-#else
-    points.push_back(Point(-2, 1.2));
-    points.push_back(Point(-2, -1.2));
-    points.push_back(Point(3, -0));
-#endif
-    polys.push_back(points);
-
-    return new terrain::Solid(polys);
 }
 
 terrain::ConvexPolygon makeNibblePolygon(float x, float y)
@@ -64,7 +45,7 @@ terrain::ConvexPolygon makeNibblePolygon(float x, float y)
     return ConvexPolygon(points);
 }
 
-void gameloop()
+void gameloop(const gameinit::Hotseat &init)
 {
     glfwEnable( GLFW_STICKY_KEYS );
     glFrontFace(GL_CW);
@@ -72,22 +53,12 @@ void gameloop()
     World world;
     Renderer renderer(world);
 
-    Ship *ship;
-    {
-        std::vector<const Equipment*> eq;
-        eq.push_back(Equipments::get("capacitor"));
-        ship = new Ship(ShipDefs::get("test"),
-                        Engines::get("rocket"),
-                        PowerPlants::get("fission"),
-                        eq
-                       );
-    }
-    world.addShip(ship);
+    init.initialize(world);
+
+    Ship *ship = world.getPlayerShip(1);
 
     double time_now = glfwGetTime();
     double time_accumulator = 0.0;
-
-    world.addSolid(makeTerrain());
 
     bool mousedown = false;
     do {

@@ -12,6 +12,7 @@
 #include "util/conftree.h"
 #include "res/loader.h"
 
+#include "launcher.h"
 #include "ship/shipdef.h"
 #include "ship/engine.h"
 #include "ship/power.h"
@@ -31,6 +32,8 @@ namespace {
         int threads;
         int width, height;
         string gamefile;
+
+        string launchfile;
     };
 
     Args getCmdlineArgs(int argc, char **argv)
@@ -41,6 +44,7 @@ namespace {
             ("data", po::value<string>(), "data directory")
             ("game", po::value<string>(), "game file (default: game.data)")
             ("threads", po::value<int>(), "number of background threads")
+            ("launch", po::value<string>(), "quicklaunch file")
             ;
 
         po::variables_map vm;
@@ -66,6 +70,9 @@ namespace {
             args.gamefile = vm["game"].as<string>();
         else
             args.gamefile = "game.data";
+
+        if(vm.count("launch"))
+            args.launchfile = vm["launch"].as<string>();
 
         args.width = 800;
         args.height = 600;
@@ -139,6 +146,7 @@ namespace {
 int main(int argc, char **argv) {
 
     // Perform initializations
+    gameinit::Hotseat launcher;
     {
         Args args = getCmdlineArgs(argc, argv);
 
@@ -154,12 +162,18 @@ int main(int argc, char **argv) {
         if(!loadGame(args.gamefile))
             return 1;
 
+        if(args.launchfile.length() == 0) {
+            cerr << "Game menu system not yet implemented! Use --launch <file> to start the game!\n";
+            return 1;
+        }
+        launcher = gameinit::Hotseat::loadFromFile(args.launchfile);
+ 
         ThreadPool::initSingleton(args.threads);
         atexit(&ThreadPool::shutdownSingleton);
     }
 
     // Run the game
-    gameloop();
+    gameloop(launcher);
  
     return 0;
 }

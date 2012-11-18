@@ -1,3 +1,4 @@
+#include <fstream>
 #include <yaml-cpp/yaml.h>
 
 #include "../fs/datafile.h"
@@ -46,12 +47,23 @@ Node parseYAML(DataFile &datafile, const string &filename)
     if(ds->isError())
         throw BadNode("Unable to open configuration file: " + filename);
 
-    std::unique_ptr<YAML::Node> doc(new YAML::Node());
+    YAML::Node doc;
     YAML::Parser parser(ds);
-    if(!parser.GetNextDocument(*doc))
+    if(!parser.GetNextDocument(doc))
         throw BadNode(filename + ": not a YAML file!");
 
-    return asNode(*doc);
+    return asNode(doc);
+}
+
+Node parseYAML(const string &filename)
+{
+    std::ifstream fin(filename);
+    YAML::Parser parser(fin);
+    YAML::Node doc;
+    if(!parser.GetNextDocument(doc))
+        throw BadNode(filename + ": not a YAML file!");
+
+    return asNode(doc);
 }
 
 std::vector<Node> parseMultiDocYAML(DataFile &datafile, const string &filename)
@@ -63,9 +75,9 @@ std::vector<Node> parseMultiDocYAML(DataFile &datafile, const string &filename)
     YAML::Parser parser(ds);
 
     std::vector<Node> nodes;
-    std::unique_ptr<YAML::Node> doc(new YAML::Node());
-    while(parser.GetNextDocument(*doc)) {
-        nodes.push_back(asNode(*doc));
+    YAML::Node doc;
+    while(parser.GetNextDocument(doc)) {
+        nodes.push_back(asNode(doc));
     }
 
     return nodes;

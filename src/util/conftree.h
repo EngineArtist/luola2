@@ -123,6 +123,13 @@ public:
     const Node &opt(const string &name, const Node &def=Node()) const;
 
     /**
+     * Check if a node with the given name exists
+     *
+     * @return true if at(name) will return something
+     */
+    bool hasNode(const string &name) const;
+
+    /**
      * Return the set of map keys.
      *
      * @return set of map keys
@@ -166,6 +173,15 @@ private:
  * @return Configuration tree
  */
 Node parseYAML(DataFile &datafile, const string &filename);
+
+/**
+ * Like parseYAML, except the file is loaded directly
+ * from the filesystem
+ *
+ * @param filename the file name
+ * @return Configuration tree
+ */
+Node parseYAML(const string &filename);
 
 /**
  * Read the given YAML file from the datafile

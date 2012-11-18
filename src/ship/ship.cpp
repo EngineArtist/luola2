@@ -41,6 +41,24 @@ Ship::Ship(const ShipDef &def,
     setAngle(0.0f);
 }
 
+Ship *Ship::make(
+    const string &hull,
+    const string &power,
+    const string &engine,
+    const std::vector<string> &equipment
+    )
+{
+    const ShipDef &shull = ShipDefs::get(hull);
+    const Engine &sengine = Engines::get(engine);
+    const PowerPlant &spower = PowerPlants::get(power);
+
+    std::vector<const Equipment*> sequipment;
+    for(const string &eq : equipment)
+        sequipment.push_back(Equipments::get(eq));
+
+    return new Ship(shull, sengine, spower, sequipment);
+}
+
 void Ship::addBattery(float capacity, float chargerate)
 {
     m_battery += capacity;

@@ -1,7 +1,11 @@
 #ifndef LUOLA_SHIP_H
 #define LUOLA_SHIP_H
 
+#include <string>
 #include <vector>
+
+using std::string;
+
 #include "../physics.h"
 
 class ModelResource;
@@ -22,6 +26,13 @@ public:
          const Engine &engine,
          const PowerPlant &power,
          const std::vector<const Equipment*> &equipment
+        );
+
+    static Ship *make(
+        const string &hull,
+        const string &power,
+        const string &engine,
+        const std::vector<string> &equipment
         );
 
     /**

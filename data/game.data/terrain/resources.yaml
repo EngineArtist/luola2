@@ -10,10 +10,10 @@ core.shader.terrain:
 core.shader.terrain.vertex:
     type: shader
     subtype: vertex
-    src: terrain_vertex.glsl
+    src: terrain/terrain_vertex.glsl
 
 core.shader.terrain.fragment:
     type: shader
     subtype: fragment
-    src: terrain_fragment.glsl
+    src: terrain/terrain_fragment.glsl
 

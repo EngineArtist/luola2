@@ -7,7 +7,16 @@
 #include <GL/glfw.h>
 
 #include "fs/paths.h"
+#include "fs/datafile.h"
 #include "util/threadpool.h"
+#include "util/conftree.h"
+#include "res/loader.h"
+
+#include "ship/shipdef.h"
+#include "ship/engine.h"
+#include "ship/power.h"
+#include "equipment/equipment.h"
+
 #include "game.h"
 
 using std::string;
@@ -21,6 +30,7 @@ namespace {
         string data;
         int threads;
         int width, height;
+        string gamefile;
     };
 
     Args getCmdlineArgs(int argc, char **argv)
@@ -29,6 +39,7 @@ namespace {
         opts.add_options()
             ("help", "show this message")
             ("data", po::value<string>(), "data directory")
+            ("game", po::value<string>(), "game file (default: game.data)")
             ("threads", po::value<int>(), "number of background threads")
             ;
 
@@ -50,6 +61,11 @@ namespace {
             args.threads = vm["threads"].as<int>();
         else
             args.threads = 0;
+
+        if(vm.count("game"))
+            args.gamefile = vm["game"].as<string>();
+        else
+            args.gamefile = "game.data";
 
         args.width = 800;
         args.height = 600;
@@ -93,6 +109,31 @@ namespace {
         glfwSetWindowTitle("Luola 2.0");
         return true;
     }
+
+    bool loadGame(const string &gamefile)
+    {
+        DataFile df(gamefile);
+
+        // Load resources
+        {
+            ResourceLoader rl(df, "resources.yaml");
+        }
+
+        // Load game configuration
+        conftree::Node gameconf = conftree::parseYAML(df, "game.yaml");
+
+        string title = gameconf.opt("title", conftree::Node("Luola 2.0")).value();
+        glfwSetWindowTitle(title.c_str());
+
+        // Load ship components
+        conftree::Node ship = gameconf.at("ship");
+        ShipDefs::loadAll(df, ship.at("hulls").value());
+        Engines::loadAll(df, ship.at("engines").value());
+        PowerPlants::loadAll(df, ship.at("power").value());
+        Equipments::loadAll(df, ship.at("equipment").value());
+
+        return true;
+    }
 }
 
 int main(int argc, char **argv) {
@@ -108,6 +149,9 @@ int main(int argc, char **argv) {
             return 1;
 
         if(!initOpengl(args.width, args.height))
+            return 1;
+
+        if(!loadGame(args.gamefile))
             return 1;
 
         ThreadPool::initSingleton(args.threads);

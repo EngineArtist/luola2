@@ -1,0 +1,13 @@
+# The name of the game
+title: Luola 2.0
+
+# Map font IDs to font resources
+fonts:
+    default: core.font.default
+
+# Ship component descriptions
+ship:
+    hulls: ship/hulls.yaml
+    power: ship/power.yaml
+    engines: ship/engines.yaml
+    equipment: ship/equipment.yaml

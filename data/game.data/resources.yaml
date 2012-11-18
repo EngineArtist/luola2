@@ -1,0 +1,4 @@
+include:
+    - font/resources.yaml
+    - terrain/resources.yaml
+---

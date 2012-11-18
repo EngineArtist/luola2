@@ -69,24 +69,6 @@ void gameloop()
     glfwEnable( GLFW_STICKY_KEYS );
     glFrontFace(GL_CW);
 
-    {
-        DataFile df("core.data");
-        if(df.isError()) {
-            std::cerr << "core data error: " << df.errorString() << "\n";
-            return;
-        }
-
-        ResourceLoader rl(df, "resources.yaml");
-    }
-    {
-        DataFile df("game.data");
-        Engines::loadAll(df, "engines.yaml");
-        PowerPlants::loadAll(df, "power.yaml");
-        Equipments::loadAll(df, "equipment.yaml");
-    }
-
-    ShipDefs::load("test");
-
     World world;
     Renderer renderer(world);
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 
+class DataFile;
 class ModelResource;
 class ResourceLoader;
 
@@ -98,14 +99,17 @@ public:
     ShipDefs(const ShipDefs&) = delete;
 
     /**
-     * Load the named ship into memory.
+     * Load all ships listed in the given file to memory
      *
-     * The data file "name.ship" will be searched and loaded.
+     * The file should contain a list of names. The data files
+     * "name.ship"  will then be searched for ship configurations
+     * and assets.
+     * 
      * In case of error, ShipDefException will be thrown.
      * 
      * @param name name of the ship to load
      */
-    static void load(const string &name);
+    static void loadAll(DataFile &datafile, const string &filename);
 
     /**
      * Get the named ship definition.
@@ -120,6 +124,7 @@ public:
 
 private:
     static ShipDefs &getInstance();
+    static void load(const string &shipname);
 
     std::unordered_map<string, ShipDef*> m_shipdefs;
 };

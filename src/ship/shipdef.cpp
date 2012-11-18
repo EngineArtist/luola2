@@ -43,6 +43,18 @@ ShipDefs &ShipDefs::getInstance()
     return *SHIPDEFS;
 }
 
+void ShipDefs::loadAll(DataFile &datafile, const string &filename)
+{
+    conftree::Node ships = conftree::parseYAML(datafile, filename);
+
+#ifndef NDEBUG
+    cerr << "Loading " << ships.items() << " ship definitions.\n";
+#endif
+    for(unsigned int i=0;i<ships.items();++i) {
+        load(ships.at(i).value());
+    }
+}
+
 void ShipDefs::load(const string &shipname)
 {
     ShipDefs &shipdefs = getInstance();

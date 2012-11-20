@@ -1,6 +1,7 @@
 #ifndef LUOLA_SHIP_H
 #define LUOLA_SHIP_H
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -13,27 +14,53 @@ class ShipDef;
 class Engine;
 class PowerPlant;
 class Equipment;
+class Weapon;
+class ProjectileDef;
+
+namespace gameinit {
+    class WeaponConf;
+    class ShipConf;
+}
+
+/**
+ * Maximum number of weapons that will fit on the ship.
+ *
+ * The game engine /should/ be weapon count agnostic.
+ * Should we ever decide to support more (or less) weapons, this constant
+ * (and the weapon selection UI and trigger input mappings)
+ * should be the only things that need changing.
+ */
+static const int MAX_WEAPONS = 2;
+
+/**
+ * A ship's weapon type and status.
+ *
+ * For weapon types with no customizable ammo, the projectile
+ * field should be null.
+ */
+struct ShipWeapon {
+    //! The weapon
+    const Weapon *weapon;
+
+    //! Projectile type for launcher weapons
+    const ProjectileDef *projectile;
+
+    //! Weapon cooloff timer
+    int cooloff;
+};
+typedef std::array<ShipWeapon, MAX_WEAPONS> ShipWeapons;
 
 class Ship {
 public:
-    /**
-     * Construct a ship
-     *
-     * @param def ship definition
-     * @param engine ship engine
-     */
-    Ship(const ShipDef &def,
-         const Engine &engine,
-         const PowerPlant &power,
-         const std::vector<const Equipment*> &equipment
-        );
+    Ship() = default;
 
-    static Ship *make(
-        const string &hull,
-        const string &power,
-        const string &engine,
-        const std::vector<string> &equipment
-        );
+	/**
+	 * Make a ship with the given customizations.
+	 *
+	 * @param conf ship configuration
+	 * @return ship instance
+	 */
+    static Ship make(const gameinit::ShipConf &conf);
 
     /**
      * Get the physics object of the ship
@@ -43,7 +70,7 @@ public:
     const Physical &physics() const { return m_physics; }
 
     /**
-     * Add a battery to the ship
+     * Add a batteryG to the ship
      *
      * @param capacity battery capacity
      * @param chargerate battery charge rate
@@ -91,6 +118,14 @@ public:
     void thrust(bool on);
 
     /**
+     * Trigger/untrigger weapon.
+     *
+     * @param weapon the weapon number. Must be in range [1..MAX_WEAPONS]
+     * @param on trigger state
+     */
+    void trigger(int weapon, bool on);
+
+    /**
      * Perform ship simulation step.
      *
      * This runs the ship's internal systems (engine, turning, weapons, etc.)
@@ -107,6 +142,19 @@ public:
     void setAngle(float a);
 
 private:
+    /**
+     * Construct a ship
+     *
+     * @param def ship definition
+     * @param engine ship engine
+     */
+    Ship(const ShipDef *def,
+         const Engine *engine,
+         const PowerPlant *power,
+         const std::vector<const Equipment*> &equipment,
+         const ShipWeapons &weapons
+        );
+
     Physical m_physics;
 
     float m_angle;
@@ -122,9 +170,11 @@ private:
 
     TurnDir m_state_turn;
     bool m_state_thrust;
+    bool m_state_trigger[MAX_WEAPONS];
 
-    const Engine &m_engine;
-    const PowerPlant &m_power;
+    const Engine *m_engine;
+    const PowerPlant *m_power;
+    ShipWeapons m_weapons;
 
     const ModelResource *m_model;
 };

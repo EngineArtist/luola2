@@ -4,8 +4,7 @@
 #include <vector>
 
 #include "terrain/terrains.h"
-
-class Ship;
+#include "ship/ship.h"
 
 /**
  * Game world state
@@ -47,7 +46,7 @@ public:
      * @param player the player to whom the ship belongs to
      * @param ship the ship to add
      */
-    void addShip(int player, Ship *ship);
+    void addShip(int player, const Ship &ship);
 
     // TODO
     Ship *getPlayerShip(int player);
@@ -87,7 +86,7 @@ public:
     void makeHole(const terrain::ConvexPolygon &hole);
 
 private:
-    std::vector<Ship*> m_ships;
+    std::vector<Ship> m_ships;
 
     // Root zone properties
     terrain::ZoneProps m_rootzone;

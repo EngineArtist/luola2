@@ -47,7 +47,7 @@ private:
 
 class Engines {
 public:
-    Engines() {}
+    Engines() = default;
     Engines(const Engines&) = delete;
 
     /**
@@ -66,7 +66,7 @@ public:
      * @param name engine name
      * @return shared engine instance
      */
-    static const Engine &get(const string &name);
+    static const Engine *get(const string &name);
 
 private:
     static Engines &getInstance();

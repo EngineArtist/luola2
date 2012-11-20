@@ -31,12 +31,12 @@ void Engines::loadAll(DataFile &df, const string &filename)
         e.m_engines[key] = new Engine(node.at(key));
 }
 
-const Engine &Engines::get(const string &name)
+const Engine *Engines::get(const string &name)
 {
     const Engines &e = getInstance();
 
     try {
-        return *e.m_engines.at(name);
+        return e.m_engines.at(name);
     } catch(const std::out_of_range &ex) {
         throw ShipDefException("engine \"" + name + "\" not defined!");
     }

@@ -12,7 +12,7 @@
 
 #include "physics.h"
 #include "game.h"
-#include "launcher.h"
+#include "gameinit.h"
 #include "world.h"
 #include "ship/shipdef.h"
 #include "ship/ship.h"

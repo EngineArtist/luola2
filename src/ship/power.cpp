@@ -30,12 +30,12 @@ void PowerPlants::loadAll(DataFile &df, const string &filename)
         pp.m_pplants[key] = new PowerPlant(node.at(key));
 }
 
-const PowerPlant &PowerPlants::get(const string &name)
+const PowerPlant *PowerPlants::get(const string &name)
 {
     const PowerPlants &pp = getInstance();
 
     try {
-        return *pp.m_pplants.at(name);
+        return pp.m_pplants.at(name);
     } catch(const std::out_of_range &ex) {
         throw ShipDefException("power plant \"" + name + "\" not defined!");
     }

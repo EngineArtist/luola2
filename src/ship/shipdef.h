@@ -95,7 +95,7 @@ private:
  */
 class ShipDefs {
 public:
-    ShipDefs() {}
+    ShipDefs() = default;
     ShipDefs(const ShipDefs&) = delete;
 
     /**
@@ -120,7 +120,7 @@ public:
      * @param name ship name
      * @return ship definition
      */
-    static const ShipDef &get(const string &name);
+    static const ShipDef *get(const string &name);
 
 private:
     static ShipDefs &getInstance();

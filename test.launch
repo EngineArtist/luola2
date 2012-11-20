@@ -6,4 +6,7 @@ player1:
     engine: rocket
     equipment:
         - capacitor
+    weapon1:
+        weapon: railgun
+        ammo: blastingbolt
     position: [0, 3]

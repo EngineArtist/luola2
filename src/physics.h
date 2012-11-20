@@ -10,7 +10,18 @@ class World;
  */
 class Physical {
 public:
-    /// Physics simulation time step, or delta T.
+    /**
+     * Ticks Per Second.
+     *
+     * This is the number of simulation steps taken in one second.
+     */
+    static const float TPS;
+
+    /**
+     * delta T
+     *
+     * This is the length (in seconds) of a single physics tick.
+     */
     static const float TIMESTEP;
 
     /**
@@ -25,7 +36,7 @@ public:
      * @param mass mass
      * @param radius radius
      */
-    Physical(const glm::vec2 &pos, float mass, float radius);
+    Physical(float mass, float radius, const glm::vec2 &pos, const glm::vec2 &vel);
 
     /**
      * Get the position of the object

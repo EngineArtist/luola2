@@ -12,11 +12,13 @@
 #include "util/conftree.h"
 #include "res/loader.h"
 
-#include "launcher.h"
+#include "gameinit.h"
 #include "ship/shipdef.h"
 #include "ship/engine.h"
 #include "ship/power.h"
 #include "equipment/equipment.h"
+#include "weapon/weapon.h"
+#include "projectile/projectiledef.h"
 
 #include "game.h"
 
@@ -138,6 +140,8 @@ namespace {
         Engines::loadAll(df, ship.at("engines").value());
         PowerPlants::loadAll(df, ship.at("power").value());
         Equipments::loadAll(df, ship.at("equipment").value());
+		Projectiles::loadAll(df, ship.at("projectiles").value());
+		Weapons::loadAll(df, ship.at("weapons").value());
 
         return true;
     }

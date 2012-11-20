@@ -1,0 +1,4 @@
+blastingbolt:
+    codebase: simplebullet
+    mass: 1
+    radius: 0.1

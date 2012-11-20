@@ -6,9 +6,9 @@
 void World::step()
 {
     for(unsigned int i=0;i<m_ships.size();++i) {
-        Physical &obj = m_ships[i]->physics();
+        Physical &obj = m_ships[i].physics();
 
-        m_ships[i]->shipStep();
+        m_ships[i].shipStep();
         obj.step(*this);
 
         // Boundary collisions
@@ -23,7 +23,7 @@ void World::step()
 
         // Object-object collisions
         for(unsigned int j=i+1;j<m_ships.size();++j) {
-            if(obj.checkCollision(m_ships[j]->physics())) {
+            if(obj.checkCollision(m_ships[j].physics())) {
                 std::cout << "collision " << i << "--" << j << std::endl;
             }
         }
@@ -58,9 +58,8 @@ bool World::checkTerrainCollision(const terrain::Point &p, float r, const glm::v
     return false;
 }
 
-void World::addShip(int player, Ship *ship)
+void World::addShip(int player, const Ship &ship)
 {
-    assert(ship);
     assert(player > 0);
     m_ships.push_back(ship);
 }
@@ -68,7 +67,7 @@ void World::addShip(int player, Ship *ship)
 Ship *World::getPlayerShip(int player)
 {
     // TODO
-    return m_ships[0];
+    return &m_ships[0];
 }
 
 void World::addZone(terrain::Zone *zone)

@@ -1,17 +1,31 @@
-#ifndef LUOLA_LAUNCHER_H
-#define LUOLA_LAUNCHER_H
+#ifndef LUOLA_GAMEINIT_H
+#define LUOLA_GAMEINIT_H
 
+#include <array>
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
 
 #include "util/optional.h"
+#include "ship/ship.h"
 
 using std::string;
 
 class World;
 
 namespace gameinit {
+
+struct WeaponConf {
+    // Name of the weapon
+    string weapon;
+
+    // Name of the projectile to use as ammo.
+    // Note. Not all weapons have selectable ammo!
+    // For those, an empty string should be used.
+    string ammo;
+};
+
+typedef std::array<WeaponConf, MAX_WEAPONS> WeaponConfs;
 
 /**
  * Configurable ship attributes
@@ -21,6 +35,7 @@ struct ShipConf {
     string power;
     string engine;
     std::vector<string> equipment;
+    WeaponConfs weapons;
     Optional<glm::vec2> position;
 };
 

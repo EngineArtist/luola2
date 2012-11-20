@@ -14,10 +14,6 @@ using std::endl;
 
 namespace terrain {
 
-ConvexPolygon::ConvexPolygon()
-{
-}
-
 ConvexPolygon::ConvexPolygon(const Points &points)
     : m_points(points), m_bounds(points)
 {
@@ -41,28 +37,6 @@ void ConvexPolygon::make(const Points &points, std::vector<ConvexPolygon> &polys
 #else
     polys.push_back(points);
 #endif
-}
-
-ConvexPolygon::ConvexPolygon(const ConvexPolygon &p)
-    : m_points(p.m_points),
-      m_normals(p.m_normals),
-      m_bounds(p.m_bounds)
-{
-}
-
-ConvexPolygon::ConvexPolygon(ConvexPolygon &&p)
-    : m_points(std::move(p.m_points)),
-      m_normals(std::move(p.m_normals)),
-      m_bounds(p.m_bounds)
-{
-}
-
-ConvexPolygon &ConvexPolygon::operator=(ConvexPolygon &&p)
-{
-    m_points = std::move(p.m_points);
-    m_normals = std::move(p.m_normals);
-    m_bounds = p.m_bounds;
-    return *this;
 }
 
 bool ConvexPolygon::circleCollision(const Point &p, float r, const glm::vec2 &v, Point &cp, glm::vec2 &normal) const
@@ -460,3 +434,4 @@ void ConvexPolygon::toTriangles(Points &points) const
 }
 
 }
+

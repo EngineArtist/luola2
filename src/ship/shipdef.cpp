@@ -82,11 +82,11 @@ void ShipDefs::load(const string &shipname)
     shipdefs.m_shipdefs[shipname] = shipdef;
 }
 
-const ShipDef &ShipDefs::get(const string &name)
+const ShipDef *ShipDefs::get(const string &name)
 {
     const ShipDefs &sd = getInstance();
     try {
-        return *sd.m_shipdefs.at(name);
+        return sd.m_shipdefs.at(name);
     } catch(const std::out_of_range &ex) {
         throw ShipDefException("definition for ship \"" + name + "\" not loaded!");
     }

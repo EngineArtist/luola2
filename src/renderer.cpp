@@ -34,8 +34,8 @@ void Renderer::render(double frametime) const
     for(const terrain::Solid *solid : m_world.m_dyn_terrain)
         solid->draw(PV);
 
-    for(const Ship *ship : m_world.m_ships)
-        ship->draw(PV);
+    for(const Ship &ship : m_world.m_ships)
+        ship.draw(PV);
 
 #if 0
     for(int i=0;i<OBJS;++i) {

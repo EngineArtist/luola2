@@ -3,7 +3,8 @@
 #include "physics.h"
 #include "world.h"
 
-const float Physical::TIMESTEP = 1.0f / 60.0f;
+const float Physical::TPS = 60.0f;
+const float Physical::TIMESTEP = 1.0f / Physical::TPS;
 
 namespace {
     struct Derivate
@@ -42,8 +43,8 @@ Physical::Physical()
 {
 }
 
-Physical::Physical(const glm::vec2 &pos, float mass, float radius)
-    : m_pos(pos), m_vel(glm::vec3(0.0f)), m_mass(mass), m_radius(radius)
+Physical::Physical(float mass, float radius, const glm::vec2 &pos, const glm::vec2 &vel)
+    : m_pos(pos), m_vel(vel), m_mass(mass), m_radius(radius)
 {
 }
 

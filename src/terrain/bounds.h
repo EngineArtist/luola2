@@ -13,7 +13,7 @@ public:
     /**
      * Construct a blank bounding rectangle
      */
-    BRect();
+    BRect() = default;
 
     /**
      * Construct a bounding rectangle from corner coordinates

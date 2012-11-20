@@ -12,7 +12,7 @@ namespace terrain {
   */
  class ConvexPolygon {
  public:
-     ConvexPolygon();
+     ConvexPolygon() = default;
 
      /**
       * Construct a convex polygon.
@@ -21,21 +21,6 @@ namespace terrain {
       * @param points the list of vertices. Must contain at least three.
       */
      ConvexPolygon(const Points &point);
-
-     /**
-      * Copy constructor
-      */
-     ConvexPolygon(const ConvexPolygon &polygon);
-
-     /**
-      * Move constructor
-      */
-     ConvexPolygon(ConvexPolygon &&polygon);
-
-     /**
-      * Move assignment operator
-      */
-     ConvexPolygon &operator=(ConvexPolygon &&polygon);
 
      /**
       * Partition an arbitrary polygon into a set of convex polygons.
@@ -161,5 +146,5 @@ namespace terrain {
 
 }
 
- #endif
+#endif
  

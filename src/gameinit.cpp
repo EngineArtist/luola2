@@ -1,8 +1,9 @@
 #include <ostream>
+#include <boost/lexical_cast.hpp>
 
 #include "util/conftree.h"
 
-#include "launcher.h"
+#include "gameinit.h"
 #include "world.h"
 #include "ship/ship.h"
 #include "terrain/terrains.h"
@@ -27,6 +28,19 @@ namespace {
             node.at(1).floatValue()));
     }
 
+    WeaponConfs parseWeaponConfs(const conftree::Node &node)
+    {
+        WeaponConfs confs;
+        for(unsigned int i=0;i<confs.size();++i) {
+            const conftree::Node wn = node.opt("weapon" + boost::lexical_cast<string>(i+1));
+            if(wn.type() != conftree::Node::BLANK) {
+                confs[i].weapon = wn.at("weapon").value();
+                confs[i].ammo = wn.at("ammo").value();
+            }
+        }
+        return confs;
+    }
+
     ShipConf parseShipConf(const conftree::Node &node)
     {
         return {
@@ -34,6 +48,7 @@ namespace {
             node.at("power").value(),
             node.at("engine").value(),
             node2vec(node.opt("equipment")),
+            parseWeaponConfs(node),
             node2optvec2(node.opt("position"))
         };
     }
@@ -93,9 +108,9 @@ void Hotseat::initialize(World &world) const
         int player = psc.first;
         const ShipConf &sc = psc.second;
 
-        Ship *ship = Ship::make(sc.hull, sc.power, sc.engine, sc.equipment);
+        Ship ship = Ship::make(sc);
         if(sc.position.hasValue())
-            ship->physics().setPosition(sc.position.get());
+            ship.physics().setPosition(sc.position.get());
 
         world.addShip(player, ship);
     }

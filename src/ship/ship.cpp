@@ -2,26 +2,31 @@
 #include <cmath>
 
 #include "../res/model.h"
+#include "../gameinit.h"
 
 #include "shipdef.h"
 #include "ship.h"
 #include "engine.h"
 #include "power.h"
 #include "../equipment/equipment.h"
+#include "../weapon/weapon.h"
+#include "../projectile/projectiledef.h"
 
-Ship::Ship(const ShipDef &def,
-           const Engine &engine,
-           const PowerPlant &power,
-           const std::vector<const Equipment*> &equipment
+Ship::Ship(const ShipDef *def,
+           const Engine *engine,
+           const PowerPlant *power,
+           const std::vector<const Equipment*> &equipment,
+           const ShipWeapons &weapons
           )
-    : m_turnrate(def.turningRate() * Physical::TIMESTEP),
+    : m_turnrate(def->turningRate() * Physical::TIMESTEP),
       m_engine(engine),
       m_power(power),
-      m_model(def.model())
+      m_weapons(weapons),
+      m_model(def->model())
 {
     // Set physical properties
-    m_physics.setRadius(def.radius());
-    m_physics.setMass(def.mass());
+    m_physics.setRadius(def->radius());
+    m_physics.setMass(def->mass());
     m_physics.setPosition(glm::vec2(0, 0));
     m_physics.setVelocity(glm::vec2(0, 1));
 
@@ -35,28 +40,39 @@ Ship::Ship(const ShipDef &def,
     }
 
     // Calculate cached values
-    m_maxenergy = power.energy() / Physical::TIMESTEP + m_battery;
+    m_maxenergy = power->energy() / Physical::TIMESTEP + m_battery;
     m_energy = m_maxenergy;
 
     setAngle(0.0f);
 }
 
-Ship *Ship::make(
-    const string &hull,
-    const string &power,
-    const string &engine,
-    const std::vector<string> &equipment
-    )
+Ship Ship::make(const gameinit::ShipConf &shipconf)
 {
-    const ShipDef &shull = ShipDefs::get(hull);
-    const Engine &sengine = Engines::get(engine);
-    const PowerPlant &spower = PowerPlants::get(power);
+    const ShipDef *hull = ShipDefs::get(shipconf.hull);
+    const Engine *engine = Engines::get(shipconf.engine);
+    const PowerPlant *power = PowerPlants::get(shipconf.power);
 
-    std::vector<const Equipment*> sequipment;
-    for(const string &eq : equipment)
-        sequipment.push_back(Equipments::get(eq));
+    std::vector<const Equipment*> equipment;
+    for(const string &eq : shipconf.equipment)
+        equipment.push_back(Equipments::get(eq));
 
-    return new Ship(shull, sengine, spower, sequipment);
+    ShipWeapons weapons;
+    for(unsigned int i=0;i<weapons.size();++i) {
+        if(shipconf.weapons[i].weapon.empty()) {
+            weapons[i].weapon = nullptr;
+            weapons[i].projectile = nullptr;
+        } else {
+            weapons[i].weapon = Weapons::get(shipconf.weapons[i].weapon);
+            if(shipconf.weapons[i].ammo.empty())
+                weapons[i].projectile = nullptr;
+            else
+                weapons[i].projectile = Projectiles::get(shipconf.weapons[i].ammo);
+        }
+
+        weapons[i].cooloff = 0;
+    }
+
+    return Ship(hull, engine, power, equipment, weapons);
 }
 
 void Ship::addBattery(float capacity, float chargerate)
@@ -85,8 +101,8 @@ void Ship::setAngle(float a)
 
     m_angle = a;
     m_thrustimpulse = glm::vec2(
-        cos(a) * m_engine.thrust(),
-        sin(a) * m_engine.thrust()
+        cos(a) * m_engine->thrust(),
+        sin(a) * m_engine->thrust()
         );
 }
 
@@ -100,10 +116,16 @@ void Ship::thrust(bool on)
     m_state_thrust = on;
 }
 
+void Ship::trigger(int weapon, bool on)
+{
+    assert(weapon>0 && weapon <= MAX_WEAPONS);
+    m_state_trigger[weapon-1] = on;
+}
+
 void Ship::shipStep()
 {
     // Power generation
-    float energy = m_energy + m_power.energy();
+    float energy = m_energy + m_power->energy();
 
     // Turning
     float a = m_angle;
@@ -125,13 +147,22 @@ void Ship::shipStep()
 
     // Engine
     if(m_state_thrust) {
-        float e = m_engine.thrustEnergy();
+        float e = m_engine->thrustEnergy();
         if(energy >= e) {
             m_physics.addImpulse(m_thrustimpulse);
             energy -= e;
         }
     } else {
-        energy -= m_engine.idleEnergy();
+        energy -= m_engine->idleEnergy();
+    }
+
+    // Weapons
+    for(unsigned int i=0;i<m_weapons.size();++i) {
+        if(m_weapons[i].cooloff > 0) {
+            --m_weapons[i].cooloff;
+        } else if(m_state_trigger[i] && m_weapons[i].weapon) {
+            // Trigger pressed and weapon cooled off: fire
+        }
     }
 
     // Charge battery with leftover energy

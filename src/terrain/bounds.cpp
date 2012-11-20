@@ -2,10 +2,6 @@
 
 namespace terrain {
 
-BRect::BRect()
-{
-}
-
 BRect::BRect(const glm::vec2 &btmleft, const glm::vec2 &topright)
 : m_btmleft(btmleft), m_topright(topright)
 {

@@ -30,7 +30,7 @@ private:
 
 class PowerPlants {
 public:
-    PowerPlants() { }
+    PowerPlants() = default;
     PowerPlants(const PowerPlants&) = delete;
 
     /**
@@ -49,7 +49,7 @@ public:
      * @param name power plant name
      * @return shared power plant instance
      */
-    static const PowerPlant &get(const string &name);
+    static const PowerPlant *get(const string &name);
     
 private:
     static PowerPlants &getInstance();

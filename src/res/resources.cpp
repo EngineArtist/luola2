@@ -2,6 +2,8 @@
 
 #include "resources.h"
 
+namespace resource {
+
 namespace {
     Resources *RESOURCES;
 }
@@ -74,4 +76,6 @@ std::ostream &operator<<(std::ostream &os, const ResourceException &ex)
     os << "Resource loading exception (" << ex.datafile() << "/" << ex.resource()
         << "): " << ex.error();
     return os;
+}
+
 }

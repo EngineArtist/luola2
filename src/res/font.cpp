@@ -13,6 +13,8 @@
 #include "texture.h"
 #include "shader.h"
 
+namespace resource {
+
 namespace {
     struct CharDescription {
         // The glyph rectangle UV coordinates
@@ -97,9 +99,9 @@ namespace {
 
 // Private implementation so we don't leak all the messy details outside
 // this module.
-class FontResourceImpl {
+class FontImpl {
 public:
-    FontResourceImpl(const CharMap &charmap, TextureResource *texture, ProgramResource *program)
+    FontImpl(const CharMap &charmap, Texture *texture, Program *program)
         : m_charmap(charmap)
     {
         // Create vertices and their UV coordinates.
@@ -186,7 +188,7 @@ public:
         m_texture_id = texture->id();
     }
 
-    ~FontResourceImpl()
+    ~FontImpl()
     {
         glDeleteBuffers(3, m_buffers);
         glDeleteVertexArrays(1, &m_vao);
@@ -255,17 +257,17 @@ private:
     GLuint m_scale_uniform;
 };
 
-FontResource *FontResource::load(
+Font *Font::load(
     const string& name,
-    DataFile &datafile,
+    fs::DataFile &datafile,
     const string &descfile,
-    TextureResource *texture,
-    ProgramResource *program)
+    Texture *texture,
+    Program *program)
 {
     // Load font description
     string fontdesc;
     {
-        DataStream ds(datafile, descfile);
+        fs::DataStream ds(datafile, descfile);
         fontdesc = string(
             (std::istreambuf_iterator<char>(ds)),
             std::istreambuf_iterator<char>());
@@ -278,29 +280,29 @@ FontResource *FontResource::load(
     }
 
     // Private implementation class handles the rest
-    FontResourceImpl *impl = new FontResourceImpl(charmap, texture, program);
+    FontImpl *impl = new FontImpl(charmap, texture, program);
 
-    FontResource *res = new FontResource(name, impl);
+    Font *res = new Font(name, impl);
     Resources::getInstance().registerResource(res);
     return res;
 }
 
-FontResource::FontResource(const string& name, FontResourceImpl *impl)
+Font::Font(const string& name, FontImpl *impl)
     : Resource(name, FONT), m_priv(impl)
 {
 }
 
-FontResource::~FontResource()
+Font::~Font()
 {
     delete m_priv;
 }
 
-TextRenderer FontResource::text(const string &text)
+TextRenderer Font::text(const string &text)
 {
     return TextRenderer(this, text.c_str());
 }
 
-TextRenderer FontResource::text(const char *text, ...)
+TextRenderer Font::text(const char *text, ...)
 {
     static char str[512];
     va_list arguments;
@@ -310,7 +312,7 @@ TextRenderer FontResource::text(const char *text, ...)
     return TextRenderer(this, str);
 }
 
-TextRenderer::TextRenderer(FontResource *font, const char *text)
+TextRenderer::TextRenderer(Font *font, const char *text)
     : m_font(font), m_text(text), m_scale(1.0f), m_color(1.0f), m_pos(0), m_align(LEFT)
 {
 }
@@ -318,4 +320,6 @@ TextRenderer::TextRenderer(FontResource *font, const char *text)
 void TextRenderer::render()
 {
     m_font->m_priv->renderText(m_text, m_scale, m_pos, m_color, m_align);
+}
+
 }

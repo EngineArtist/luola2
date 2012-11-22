@@ -9,9 +9,8 @@ using std::string;
 #include "projectile.h"
 
 namespace conftree { class Node; }
-
-class DataFile;
-class ModelResource;
+namespace resource { class Model; }
+namespace fs { class DataFile; }
 
 /**
  * Projectile definition.
@@ -42,7 +41,7 @@ public:
      *
      * @return model
      */
-    const ModelResource *model() const { return m_model; }
+    const resource::Model *model() const { return m_model; }
 
     /**
      * Create projectile
@@ -56,7 +55,7 @@ private:
     float m_mass;
     float m_radius;
 
-    ModelResource *m_model;
+    resource::Model *m_model;
 };
 
 class ProjectileFactoryBase
@@ -78,7 +77,7 @@ public:
      * @param df the data file
      * @param filename projectile definition file name
      */
-    static void loadAll(DataFile &df, const string &filename);
+    static void loadAll(fs::DataFile &df, const string &filename);
 
     /**
      * Get the named projectile definition

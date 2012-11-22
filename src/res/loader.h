@@ -4,7 +4,7 @@
 #include "../fs/datafile.h"
 #include "../util/conftree.h"
 
-using std::string;
+namespace resource {
 
 class Resource;
 
@@ -124,17 +124,15 @@ myFont:
 \endverbatim
  *
  */
-class ResourceLoader {
+class Loader {
 public:
-    ResourceLoader();
-
     /**
      * Construct a resource loader instance.
      *
      * @param datafile the data file from which the resources are loaded
      * @param filename the resource descriptor file
      */
-    ResourceLoader(DataFile &datafile, const string& filename);
+    Loader(fs::DataFile &datafile, const string& filename);
 
     /**
      * Load the named resource and all its dependancies from the datafile.
@@ -148,10 +146,10 @@ public:
     Resource *load(const string& name);
 
 private:
-    void parseHeader(DataFile&, const conftree::Node&);
+    void parseHeader(fs::DataFile&, const conftree::Node&);
 
     conftree::Node m_node;
-    DataFile m_datafile;
+    fs::DataFile m_datafile;
 
     Resource *loadProgram(const conftree::Node &node, const string &name);
     Resource *loadShader(const conftree::Node &node, const string &name);
@@ -161,5 +159,5 @@ private:
     Resource *loadFont(const conftree::Node &node, const string &name);
 };
 
+}
 #endif
-

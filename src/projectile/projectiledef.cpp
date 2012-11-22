@@ -9,7 +9,7 @@ ProjectileDef::ProjectileDef(const conftree::Node &node)
 {
     m_mass = node.at("mass").floatValue();
     m_radius = node.at("radius").floatValue();
-    m_model = Resources::get<ModelResource>(node.at("model").value());
+    m_model = resource::get<resource::Model>(node.at("model").value());
 }
 
 ProjectileDef::~ProjectileDef()
@@ -25,7 +25,7 @@ ProjectileFactoryBase::~ProjectileFactoryBase()
 {
 }
 
-void Projectiles::loadAll(DataFile &df, const string &filename)
+void Projectiles::loadAll(fs::DataFile &df, const string &filename)
 {
     conftree::Node node = conftree::parseYAML(df, filename);
 

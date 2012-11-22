@@ -9,7 +9,7 @@
 Renderer::Renderer(const World &world)
     : m_world(world)
 {
-    m_font = Resources::get<FontResource>("core.font.default");
+    m_font = resource::get<resource::Font>("core.font.default");
 }
 
 void Renderer::render(double frametime) const
@@ -41,7 +41,7 @@ void Renderer::render(double frametime) const
         p.draw(PV);
 
     m_font->text("FPS: %.1f", 1.0 / frametime)
-    .scale(0.5).pos(1,1).align(TextRenderer::RIGHT).color(1,1,0)
+    .scale(0.5).pos(1,1).align(resource::TextRenderer::RIGHT).color(1,1,0)
     .render();
 
     glfwSwapBuffers();

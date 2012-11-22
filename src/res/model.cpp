@@ -6,10 +6,12 @@
 
 #include "shader.h"
 
-ModelResource *ModelResource::make(
+namespace resource {
+
+Model *Model::make(
     const string& name,
-    MeshResource *mesh,
-    ProgramResource *program,
+    Mesh *mesh,
+    Program *program,
     SamplerTextures textures
     )
 {
@@ -57,7 +59,7 @@ ModelResource *ModelResource::make(
 
     glBindVertexArray(0);
 
-    ModelResource *res = new ModelResource(
+    Model *res = new Model(
         name,
         vao,
         program->id(),
@@ -74,18 +76,18 @@ ModelResource *ModelResource::make(
     return res;
 }
 
-ModelResource::ModelResource(const string& name, GLuint id, GLuint shader, GLuint mvp, GLsizei faces, const UniformTextures &textures)
+Model::Model(const string& name, GLuint id, GLuint shader, GLuint mvp, GLsizei faces, const UniformTextures &textures)
     : Resource(name, MODEL), m_id(id), m_shader_id(shader),
       m_mvp_id(mvp), m_faces(faces), m_textures(textures)
 {
 }
 
-ModelResource::~ModelResource()
+Model::~Model()
 {
     glDeleteVertexArrays(1, &m_id);
 }
 
-void ModelResource::render(const glm::mat4 &transform) const
+void Model::render(const glm::mat4 &transform) const
 {
     // Bind our vertex data
     glBindVertexArray(m_id);
@@ -108,4 +110,6 @@ void ModelResource::render(const glm::mat4 &transform) const
  
     // Draw
     glDrawElements(GL_TRIANGLES, m_faces, GL_UNSIGNED_SHORT, 0);
+}
+
 }

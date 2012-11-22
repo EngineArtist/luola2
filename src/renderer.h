@@ -2,7 +2,7 @@
 #define LUOLA_RENDERER_H
 
 class World;
-class FontResource;
+namespace resource { class Font; }
 
 class Renderer {
 public:
@@ -12,7 +12,7 @@ public:
 
 private:
     const World &m_world;
-    FontResource *m_font;
+    resource::Font *m_font;
 };
 
 #endif

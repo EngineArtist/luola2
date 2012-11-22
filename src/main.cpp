@@ -121,11 +121,11 @@ namespace {
 
     bool loadGame(const string &gamefile)
     {
-        DataFile df(gamefile);
+        fs::DataFile df(gamefile);
 
         // Load resources
         {
-            ResourceLoader rl(df, "resources.yaml");
+            resource::Loader rl(df, "resources.yaml");
         }
 
         // Load game configuration
@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
         if(args.help)
             return 0;
 
-        if(!Paths::init(args.data))
+        if(!fs::Paths::init(args.data))
             return 1;
 
         if(!initOpengl(args.width, args.height))

@@ -16,7 +16,7 @@ EquipmentFactoryBase::~EquipmentFactoryBase()
 {
 }
 
-void Equipments::loadAll(DataFile &df, const string &filename)
+void Equipments::loadAll(fs::DataFile &df, const string &filename)
 {
     conftree::Node node = conftree::parseYAML(df, filename);
 

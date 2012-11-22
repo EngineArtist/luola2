@@ -41,9 +41,9 @@ namespace {
     }
 }
 
-Node parseYAML(DataFile &datafile, const string &filename)
+Node parseYAML(fs::DataFile &datafile, const string &filename)
 {
-    DataStream ds(datafile, filename);
+    fs::DataStream ds(datafile, filename);
     if(ds->isError())
         throw BadNode("Unable to open configuration file: " + filename);
 
@@ -66,9 +66,9 @@ Node parseYAML(const string &filename)
     return asNode(doc);
 }
 
-std::vector<Node> parseMultiDocYAML(DataFile &datafile, const string &filename)
+std::vector<Node> parseMultiDocYAML(fs::DataFile &datafile, const string &filename)
 {
-    DataStream ds(datafile, filename);
+    fs::DataStream ds(datafile, filename);
     if(ds->isError())
         throw BadNode("Unable to open configuration file: " + filename);
 

@@ -7,8 +7,8 @@
 using std::string;
 
 namespace conftree { class Node; }
+namespace fs { class DataFile; }
 
-class DataFile;
 class Ship;
 
 /**
@@ -67,7 +67,7 @@ public:
      * @param df the datafile
      * @param filename equipment definition file name
      */
-    static void loadAll(DataFile &df, const string &filename);
+    static void loadAll(fs::DataFile &df, const string &filename);
 
     /**
      * Get the named equipment

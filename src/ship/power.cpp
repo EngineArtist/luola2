@@ -21,7 +21,7 @@ PowerPlants &PowerPlants::getInstance()
     return *POWERPLANTS;
 }
 
-void PowerPlants::loadAll(DataFile &df, const string &filename)
+void PowerPlants::loadAll(fs::DataFile &df, const string &filename)
 {
     conftree::Node node = conftree::parseYAML(df, filename);
 

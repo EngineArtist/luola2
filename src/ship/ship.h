@@ -10,7 +10,6 @@ using std::string;
 #include "../physics.h"
 
 class World;
-class ModelResource;
 class ShipDef;
 class Engine;
 class PowerPlant;
@@ -18,6 +17,7 @@ class Equipment;
 class Weapon;
 class ProjectileDef;
 
+namespace resource { class Model; }
 namespace gameinit {
     class WeaponConf;
     class ShipConf;
@@ -179,7 +179,7 @@ private:
     const PowerPlant *m_power;
     ShipWeapons m_weapons;
 
-    const ModelResource *m_model;
+    const resource::Model *m_model;
 };
 
 #endif

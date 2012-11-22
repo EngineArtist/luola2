@@ -9,7 +9,7 @@
 
 using std::string;
 
-class DataFile;
+namespace fs { class DataFile; }
 
 namespace conftree {
 
@@ -172,7 +172,7 @@ private:
  * @param filename the YAML file inside the datafile
  * @return Configuration tree
  */
-Node parseYAML(DataFile &datafile, const string &filename);
+Node parseYAML(fs::DataFile &datafile, const string &filename);
 
 /**
  * Like parseYAML, except the file is loaded directly
@@ -191,7 +191,7 @@ Node parseYAML(const string &filename);
  * @param filename the YAML file inside the data file
  * @return forest of configuration trees
  */
-std::vector<Node> parseMultiDocYAML(DataFile &datafile, const string &filename);
+std::vector<Node> parseMultiDocYAML(fs::DataFile &datafile, const string &filename);
 
 /**
  * Configuration tree exception

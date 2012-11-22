@@ -18,11 +18,11 @@ using std::endl;
 #include "mesh.h"
 #include "../fs/datafile.h"
 
-using std::string;
-
-MeshResource *MeshResource::load(
+namespace resource {
+ 
+Mesh *Mesh::load(
     const string& name,
-    DataFile &datafile,
+    fs::DataFile &datafile,
     const string &filename,
     const glm::vec3 &offset,
     const glm::vec3 &scale
@@ -32,7 +32,7 @@ MeshResource *MeshResource::load(
     cerr << "Loading mesh " << filename << "..." << endl;
 #endif
 
-    DataStream ds(datafile, filename);
+    fs::DataStream ds(datafile, filename);
     if(ds->isError())
         throw ResourceException(datafile.name(), name, ds->errorString());
 
@@ -184,7 +184,7 @@ MeshResource *MeshResource::load(
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    MeshResource *res = new MeshResource(
+    Mesh *res = new Mesh(
         name,
         vbId,
         indId,
@@ -198,15 +198,17 @@ MeshResource *MeshResource::load(
     return res;
 }
 
-MeshResource::MeshResource(const string& name, GLuint vertexid, GLuint elementid, GLuint normalid, GLuint uvid, GLuint colorid, int vertices, int faces)
+Mesh::Mesh(const string& name, GLuint vertexid, GLuint elementid, GLuint normalid, GLuint uvid, GLuint colorid, int vertices, int faces)
     : Resource(name, MESH),
       m_vertex(vertexid), m_element(elementid), m_normal(normalid), m_uv(uvid),
       m_color(colorid), m_vertices(vertices), m_faces(faces)
 {
 }
 
-MeshResource::~MeshResource()
+Mesh::~Mesh()
 {
     glDeleteBuffers(1, &m_vertex);
     glDeleteBuffers(1, &m_element);
+}
+
 }

@@ -22,7 +22,7 @@ Engines &Engines::getInstance()
     return *ENGINES;
 }
 
-void Engines::loadAll(DataFile &df, const string &filename)
+void Engines::loadAll(fs::DataFile &df, const string &filename)
 {
     conftree::Node node = conftree::parseYAML(df, filename);
 

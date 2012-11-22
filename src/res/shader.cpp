@@ -9,9 +9,11 @@ using std::endl;
 #include "shader.h"
 #include "../fs/datafile.h"
 
-ShaderResource *ShaderResource::load(
+namespace resource {
+
+Shader *Shader::load(
     const string& name,
-    DataFile &datafile,
+    fs::DataFile &datafile,
     const string &filename,
     Type type)
 {
@@ -19,7 +21,7 @@ ShaderResource *ShaderResource::load(
     cerr << "Loading shader " << filename << "..." << endl;
 #endif
     // Load shader source
-    DataStream ds(datafile, filename);
+    fs::DataStream ds(datafile, filename);
     if(ds->isError())
         throw ResourceException(datafile.name(), name, ds->errorString());
 
@@ -61,41 +63,41 @@ ShaderResource *ShaderResource::load(
     }
 
     // Create resource
-    ShaderResource *res = new ShaderResource(name, type, id);
+    Shader *res = new Shader(name, type, id);
     Resources::getInstance().registerResource(res);
 
     return res;
 }
 
-ShaderResource::ShaderResource(const string& name, Type type, GLuint id)
+Shader::Shader(const string& name, Type type, GLuint id)
     : Resource(name, type), m_id(id)
 {
 }
 
-ShaderResource::~ShaderResource()
+Shader::~Shader()
 {
     glDeleteShader(m_id);
 }
 
-ProgramResource *ProgramResource::make(const string& name)
+Program *Program::make(const string& name)
 {
     GLuint id = glCreateProgram();
-    ProgramResource *res = new ProgramResource(name, id);
+    Program *res = new Program(name, id);
     Resources::getInstance().registerResource(res);
     return res;
 }
 
-ProgramResource::ProgramResource(const string& name, GLuint id)
+Program::Program(const string& name, GLuint id)
     : Resource(name, SHADER_PROGRAM), m_id(id), m_linked(false)
 {
 }
 
-ProgramResource::~ProgramResource()
+Program::~Program()
 {
     glDeleteProgram(m_id);
 }
 
-void ProgramResource::addShader(ShaderResource *shader)
+void Program::addShader(Shader *shader)
 {
     if(m_linked)
         throw ResourceException("", name(), "tried to add shader to a linked program");
@@ -106,7 +108,7 @@ void ProgramResource::addShader(ShaderResource *shader)
     addDependency(shader);
 }
 
-void ProgramResource::link()
+void Program::link()
 {
 #ifndef NDEBUG
     cerr << "Linking shader program " << name() << "..." << endl;
@@ -125,4 +127,6 @@ void ProgramResource::link()
         throw ResourceException("", name(), &errormessage[0]);
     }
     m_linked = true;
+}
+
 }

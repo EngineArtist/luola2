@@ -4,11 +4,12 @@
 #include <string>
 #include <unordered_map>
 
-class DataFile;
-class ModelResource;
-class ResourceLoader;
-
+namespace resource {
+    class Model;
+    class Loader;
+}
 namespace conftree { class Node; }
+namespace fs { class DataFile; }
 
 /**
  * Ship definition.
@@ -24,7 +25,7 @@ public:
      * @param resloader the resource loader with which to load dependencies
      * @param doc configuration file root node
      */
-    ShipDef(ResourceLoader &resloader, const conftree::Node &doc);
+    ShipDef(resource::Loader &resloader, const conftree::Node &doc);
 
     /**
      * Get the short (player visible) name of the ship.
@@ -78,10 +79,10 @@ public:
      *
      * @return model resource
      */
-    const ModelResource *model() const { return m_model; }
+    const resource::Model *model() const { return m_model; }
 
 private:
-    ModelResource *m_model;
+    resource::Model *m_model;
 
     string m_shortname, m_fullname;
 
@@ -109,7 +110,7 @@ public:
      * 
      * @param name name of the ship to load
      */
-    static void loadAll(DataFile &datafile, const string &filename);
+    static void loadAll(fs::DataFile &datafile, const string &filename);
 
     /**
      * Get the named ship definition.

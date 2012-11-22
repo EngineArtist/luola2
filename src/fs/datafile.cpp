@@ -13,7 +13,9 @@
 #include "datafile.h"
 #include "paths.h"
 
-namespace fs = boost::filesystem;
+namespace fs {
+
+namespace bfs = boost::filesystem;
 namespace io = boost::iostreams;
 
 //! Base class for DataSource implementations
@@ -32,7 +34,7 @@ DataSourceImpl::~DataSourceImpl() {}
 //! Base class for data file implementations
 class DataFileImpl {
 public:
-    DataFileImpl(fs::path path)
+    DataFileImpl(bfs::path path)
         : m_path(path), m_reserved(false)
     {
     }
@@ -61,7 +63,7 @@ public:
     }
 
 protected:
-    const fs::path m_path;
+    const bfs::path m_path;
 
 private:
     bool m_reserved;
@@ -70,7 +72,7 @@ private:
 //! A data source that wraps a file
 class DataSourceFile : public DataSourceImpl {
     public:
-        DataSourceFile(const fs::path& path)
+        DataSourceFile(const bfs::path& path)
             : in_(path.native(), std::ifstream::in)
         {
         }
@@ -189,7 +191,7 @@ class DataSourceZip : public DataSourceImpl {
 //! Directory based data file implementation
 class DataFileDir : public DataFileImpl {
 public:
-    DataFileDir(const fs::path& path)
+    DataFileDir(const bfs::path& path)
         : DataFileImpl(path)
     {
     }
@@ -214,7 +216,7 @@ public:
 //! ZIP file based data file implementation
 class DataFileZip : public DataFileImpl {
 public:
-    DataFileZip(const fs::path& path)
+    DataFileZip(const bfs::path& path)
         : DataFileImpl(path), m_error(0)
     {
         m_zip = unzOpen(path.c_str());
@@ -253,8 +255,8 @@ private:
 DataFile::DataFile(const string& name)
 	: p_(nullptr)
 {
-    fs::path path = Paths::get().findDataFile(name);
-    if(fs::exists(path)) {
+    bfs::path path = Paths::get().findDataFile(name);
+    if(bfs::exists(path)) {
         if(is_directory(path)) {
             p_ = shared_ptr<DataFileImpl>(new DataFileDir(path));
         } else {
@@ -306,3 +308,4 @@ string DataSource::errorString() const
     return p_->errorString();
 }
 
+}

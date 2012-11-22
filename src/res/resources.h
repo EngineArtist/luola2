@@ -8,6 +8,8 @@
 
 using std::string;
 
+namespace resource {
+
 /**
  * Resource loading exception
  */
@@ -51,10 +53,10 @@ private:
 /**
  * Resource not found exception.
  */
-class ResourceNotFound : public ResourceException
+class NotFound : public ResourceException
 {
 public:
-    ResourceNotFound(const string& datafile, const string& resource)
+    NotFound(const string& datafile, const string& resource)
     : ResourceException(datafile, resource, "resource \"" + resource + "\" not found!")
     {}
 };
@@ -130,23 +132,6 @@ public:
     static Resources &getInstance();
 
     /**
-     * Get the named resource of the specific type
-     *
-     * @param name resource name
-     * @return resource
-     * @throw ResourceException if resource is not found or is the wrong type
-     */
-    template <class restype>
-    static restype *get(const string& name)
-    {
-        Resource *res = getInstance().getResource(name);
-        restype *r = dynamic_cast<restype*>(res);
-        if(!r)
-            throw ResourceException("", name, "wrong resource type!");
-        return r;
-    }
-
-    /**
      * Register a new resource.
      *
      * @param resource the resource to registe
@@ -160,12 +145,12 @@ public:
      * 
      * @param name resource name
      * @return resource
-     * @throw ResourceNotFound if not found
+     * @throw NotFound if not found
      */
     Resource *getResource(const string &name)
     {
         if(!m_resources.count(name))
-            throw ResourceNotFound("", name);
+            throw NotFound("", name);
         return m_resources[name];
     }
 
@@ -181,5 +166,24 @@ private:
 
     std::unordered_map<string, Resource*> m_resources;
 };
+
+/**
+ * Get the named resource of the specific type
+ *
+ * @param name resource name
+ * @return resource
+ * @throw ResourceException if resource is not found or is the wrong type
+ */
+template <class restype>
+restype *get(const string& name)
+{
+    Resource *res = Resources::getInstance().getResource(name);
+    restype *r = dynamic_cast<restype*>(res);
+    if(!r)
+        throw ResourceException("", name, "wrong resource type!");
+    return r;
+}
+
+}
 
 #endif

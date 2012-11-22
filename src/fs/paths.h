@@ -4,6 +4,8 @@
 #include <boost/filesystem.hpp>
 #include <vector>
 
+namespace fs {
+
 typedef std::vector<boost::filesystem::path> PathVector;
 
 /**
@@ -50,6 +52,8 @@ private:
     Paths(const PathVector &datapaths);
     PathVector m_datapaths;
 };
+
+}
 
 #endif
 

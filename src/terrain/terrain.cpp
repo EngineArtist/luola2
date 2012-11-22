@@ -14,7 +14,7 @@ Terrain::Terrain(const std::vector<ConvexPolygon> &polygons)
     glGenBuffers(1, &m_vbuffer);
 
     // TODO set these properly
-    m_program = Resources::getInstance().get<ProgramResource>("core.shader.terrain")->id();
+    m_program = resource::get<resource::Program>("core.shader.terrain")->id();
     m_uniform_mvp = glGetUniformLocation(m_program, "MVP");
 }
 

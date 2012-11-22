@@ -7,7 +7,7 @@
 using std::string;
 
 namespace conftree { class Node; }
-class DataFile;
+namespace fs { class DataFile; }
 
 /**
  * Ship engine definition
@@ -56,7 +56,7 @@ public:
      * @param df the datafile
      * @param filename engine definition file name
      */
-    static void loadAll(DataFile &df, const string &filename);
+    static void loadAll(fs::DataFile &df, const string &filename);
 
     /**
      * Get the named engine definition

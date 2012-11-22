@@ -19,7 +19,7 @@ WeaponFactoryBase::~WeaponFactoryBase()
 {
 }
 
-void Weapons::loadAll(DataFile &df, const string &filename)
+void Weapons::loadAll(fs::DataFile &df, const string &filename)
 {
     conftree::Node node = conftree::parseYAML(df, filename);
 

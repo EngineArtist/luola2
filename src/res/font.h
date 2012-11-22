@@ -5,14 +5,14 @@
 
 #include "resources.h"
 
-class TextureResource;
-class ProgramResource;
+namespace fs { class DataFile; }
 
-using std::string;
+namespace resource {
 
-class FontResourceImpl;
-class FontResource;
-class DataFile;
+class Texture;
+class Program;
+class FontImpl;
+class Font;
 
 /**
  * Helper class for setting text rendering settings
@@ -24,10 +24,10 @@ class DataFile;
  *  .render()                       // render text
  *
  * Note. It is not safe to keep instances of this class around for too long.
- * Subsequent calls to FontResource.text() may change the text pointer.
+ * Subsequent calls to Font.text() may change the text pointer.
  */
 class TextRenderer {
-    friend class FontResource;
+    friend class Font;
 public:
     enum Alignment { LEFT, RIGHT };
 
@@ -75,9 +75,9 @@ public:
     void render();
 
 private:
-    TextRenderer(FontResource *font, const char *text);
+    TextRenderer(Font *font, const char *text);
 
-    FontResource *m_font;
+    Font *m_font;
     const char *m_text;
     float m_scale;
     glm::vec4 m_color;
@@ -85,7 +85,7 @@ private:
     Alignment m_align;
 };
 
-class FontResource : public Resource {
+class Font : public Resource {
     friend class TextRenderer;
 public:
 
@@ -107,12 +107,12 @@ public:
      * @param descfile the font description file name
      * @param texture the font texture
      * @param shader the shader program for rendering the font
-     * @return new FontResource
+     * @return new Font
      */
-    static FontResource *load(const string &name, DataFile &datafile, const string &descfile, TextureResource *texture, ProgramResource *shader);
+    static Font *load(const string &name, fs::DataFile &datafile, const string &descfile, Texture *texture, Program *shader);
 
-    FontResource() = delete;
-    ~FontResource();
+    Font() = delete;
+    ~Font();
 
     /**
      * Render the given string.
@@ -140,10 +140,12 @@ public:
     TextRenderer text(const string &text);
 
 private:
-    FontResource(const string& name, FontResourceImpl *impl);
+    Font(const string& name, FontImpl *impl);
 
-    FontResourceImpl *m_priv;
+    FontImpl *m_priv;
 };
+
+}
 
 #endif
 

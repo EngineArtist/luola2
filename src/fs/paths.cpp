@@ -1,6 +1,9 @@
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 
 #include "paths.h"
+
+namespace fs {
 
 using boost::filesystem::path;
 using std::string;
@@ -83,4 +86,6 @@ path Paths::findDataFile(const string& filename) const
             return p;
     }
     return path();
+}
+
 }

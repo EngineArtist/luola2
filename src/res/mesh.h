@@ -6,9 +6,11 @@
 
 #include "resources.h"
 
-class DataFile;
+namespace fs { class DataFile; }
 
-class MeshResource : public Resource {
+namespace resource {
+
+class Mesh : public Resource {
 public:
     /**
      * Load a 3D model from a datafile.
@@ -41,19 +43,19 @@ public:
      * @param filename model file name (inside datafile)
      * @param offset offset to apply to each vertex
      * @param scale scaling factor to apply to each vertex. Scaling is done after offsetting
-     * @return new MeshResource
+     * @return new Mesh
      * @throw ResourceException in case of error
      */
-    static MeshResource *load(
+    static Mesh *load(
         const string& name,
-        DataFile &datafile,
+        fs::DataFile &datafile,
         const string& filename,
         const glm::vec3 &offset,
         const glm::vec3 &scale
         );
 
-    MeshResource() = delete;
-    ~MeshResource();
+    Mesh() = delete;
+    ~Mesh();
 
     GLuint vertexBufferId() const { return m_vertex; }
 
@@ -81,7 +83,7 @@ public:
 
 private:
 
-    MeshResource(const string& name, GLuint vertexid, GLuint elementid, GLuint normalid, GLuint uvid, GLuint colorid, int vertices, int faces);
+    Mesh(const string& name, GLuint vertexid, GLuint elementid, GLuint normalid, GLuint uvid, GLuint colorid, int vertices, int faces);
 
     GLuint m_vertex;
     GLuint m_element;
@@ -92,6 +94,8 @@ private:
     int m_vertices;
     int m_faces;
 };
+
+}
 
 #endif
 

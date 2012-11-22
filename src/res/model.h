@@ -9,16 +9,18 @@
 
 #include "resources.h"
 
-class MeshResource;
-class ProgramResource;
-class TextureResource;
-
 using std::string;
 
-class ModelResource : public Resource {
+namespace resource {
+
+class Mesh;
+class Program;
+class Texture;
+
+class Model : public Resource {
 public:
-    typedef std::pair<string, TextureResource*> SamplerTexture;
-    typedef std::pair<GLuint, TextureResource*> UniformTexture;
+    typedef std::pair<string, Texture*> SamplerTexture;
+    typedef std::pair<GLuint, Texture*> UniformTexture;
     typedef std::vector<SamplerTexture> SamplerTextures;
     typedef std::vector<UniformTexture> UniformTextures;
 
@@ -38,20 +40,20 @@ public:
      * 3: UVs
      * 4: colors
      */
-    static ModelResource *make(
+    static Model *make(
         const string& name,
-        MeshResource *mesh,
-        ProgramResource *program,
+        Mesh *mesh,
+        Program *program,
         SamplerTextures textures
         );
 
-    ModelResource() = delete;
-    ~ModelResource();
+    Model() = delete;
+    ~Model();
 
     void render(const glm::mat4 &transform) const;
 
 private:
-    ModelResource(const string& name, GLuint m_id, GLuint shader, GLuint mvp, GLsizei faces, const UniformTextures &textures);
+    Model(const string& name, GLuint m_id, GLuint shader, GLuint mvp, GLsizei faces, const UniformTextures &textures);
 
     GLuint m_id;
     GLuint m_shader_id;
@@ -60,6 +62,5 @@ private:
     UniformTextures m_textures;
 };
 
-
+}
 #endif
-

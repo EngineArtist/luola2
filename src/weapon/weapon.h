@@ -7,8 +7,8 @@
 using std::string;
 
 namespace conftree { class Node; }
+namespace fs { class DataFile; }
 
-class DataFile;
 class Ship;
 class World;
 class ProjectileDef;
@@ -51,7 +51,7 @@ public:
      * @param df the data file
      * @param filename weapon definition file name
      */
-    static void loadAll(DataFile &df, const string &filename);
+    static void loadAll(fs::DataFile &df, const string &filename);
 
     /**
      * Get the named weapon

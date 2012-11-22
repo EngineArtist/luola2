@@ -9,6 +9,8 @@
 using std::shared_ptr;
 using std::string;
 
+namespace fs {
+
 class DataFileImpl;
 class DataFile;
 class DataSourceImpl;
@@ -103,6 +105,7 @@ class DataFile {
         shared_ptr<DataFileImpl> p_;
 };
 
+}
 
 #endif
 

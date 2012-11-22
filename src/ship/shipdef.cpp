@@ -14,7 +14,7 @@ using std::endl;
 #include "exception.h"
 #include "shipdef.h"
 
-ShipDef::ShipDef(ResourceLoader &resloader, const conftree::Node &doc)
+ShipDef::ShipDef(resource::Loader &resloader, const conftree::Node &doc)
 {
     m_shortname = doc.at("shortname").value();
     m_fullname = doc.opt("fullname").value(m_shortname);
@@ -25,7 +25,7 @@ ShipDef::ShipDef(ResourceLoader &resloader, const conftree::Node &doc)
     m_turnrate = glm::radians(doc.at("turningrate").floatValue());
 
     string model = doc.at("model").value();
-    m_model = dynamic_cast<ModelResource*>(resloader.load(model));
+    m_model = dynamic_cast<resource::Model*>(resloader.load(model));
     if(!m_model)
         throw ShipDefException("unable to load model " + model);
 }
@@ -43,7 +43,7 @@ ShipDefs &ShipDefs::getInstance()
     return *SHIPDEFS;
 }
 
-void ShipDefs::loadAll(DataFile &datafile, const string &filename)
+void ShipDefs::loadAll(fs::DataFile &datafile, const string &filename)
 {
     conftree::Node ships = conftree::parseYAML(datafile, filename);
 
@@ -68,12 +68,12 @@ void ShipDefs::load(const string &shipname)
     }
 
     // Open ship data file
-    DataFile df(shipname + ".ship");
+    fs::DataFile df(shipname + ".ship");
     if(df.isError())
         throw ShipDefException(df.errorString());
 
     // Load ship resources
-    ResourceLoader rl(df, "resources.yaml");
+    resource::Loader rl(df, "resources.yaml");
 
     // Load ship definition file
     conftree::Node def = conftree::parseYAML(df, "ship.yaml");

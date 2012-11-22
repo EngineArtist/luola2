@@ -10,6 +10,8 @@ using std::endl;
 #include "texture.h"
 #include "../fs/datafile.h"
 
+namespace resource {
+
 namespace {
     struct Image {
         unsigned char *data;
@@ -18,10 +20,10 @@ namespace {
         bool alpha;
     };
 
-    Image loadPng(DataFile &df, const string& filename);
+    Image loadPng(fs::DataFile &df, const string& filename);
 }
 
-TextureResource *TextureResource::load(const string& name, DataFile &datafile, const string& filename)
+Texture *Texture::load(const string& name, fs::DataFile &datafile, const string& filename)
 {
 #ifndef NDEBUG
     cerr << "Loading texture " << filename << "..." << endl;
@@ -44,19 +46,19 @@ TextureResource *TextureResource::load(const string& name, DataFile &datafile, c
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    TextureResource *res = new TextureResource(name, id, img.width, img.height, GL_TEXTURE_2D);
+    Texture *res = new Texture(name, id, img.width, img.height, GL_TEXTURE_2D);
     Resources::getInstance().registerResource(res);
 
     return res;
 }
 
-TextureResource::TextureResource(const string& name, GLuint id, int width, int height, GLenum target)
+Texture::Texture(const string& name, GLuint id, int width, int height, GLenum target)
     : Resource(name, TEXTURE), m_id(id), m_width(width), m_height(height), m_target(target)
 {
 
 }
 
-TextureResource::~TextureResource()
+Texture::~Texture()
 {
     glDeleteTextures(1, &m_id);
 }
@@ -65,17 +67,17 @@ namespace {
 
 void pngReadDsCallback(png_structp pngPtr, png_bytep data, png_size_t length)
 {
-    DataStream *ds = static_cast<DataStream*>(png_get_io_ptr(pngPtr));
+    fs::DataStream *ds = static_cast<fs::DataStream*>(png_get_io_ptr(pngPtr));
 
     ds->read(reinterpret_cast<char*>(data), length);
 }
 
-Image loadPng(DataFile &df, const string& filename)
+Image loadPng(fs::DataFile &df, const string& filename)
 {
     Image img;
 
     // Open image file
-    DataStream ds(df, filename);
+    fs::DataStream ds(df, filename);
     if(ds->isError())
         throw ResourceException(df.name(), filename, "PNG open error");
 
@@ -147,6 +149,8 @@ Image loadPng(DataFile &df, const string& filename)
     delete[] rowPointers;
 
     return img;
+}
+
 }
 
 }

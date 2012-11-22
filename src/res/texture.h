@@ -5,9 +5,11 @@
 
 #include "resources.h"
 
-class DataFile;
+namespace fs { class DataFile; }
 
-class TextureResource : public Resource {
+namespace resource {
+
+class Texture : public Resource {
 public:
     /**
      * Load a texture from a datafile.
@@ -17,13 +19,13 @@ public:
      * @param name resource name
      * @param datafile the datafile from which to load the texture
      * @param filename texture filename (inside datafile)
-     * @return new TextureResource
+     * @return new Texture
      * @throw ResourceException in case of error
      */
-    static TextureResource *load(const string& name, DataFile &datafile, const string& filename);
+    static Texture *load(const string& name, fs::DataFile &datafile, const string& filename);
 
-    TextureResource() = delete;
-    ~TextureResource();
+    Texture() = delete;
+    ~Texture();
 
     GLuint id() const { return m_id; }
 
@@ -51,12 +53,13 @@ public:
     GLenum target() const { return m_target; }
 
 private:
-    TextureResource(const string& name, GLuint id, int width, int height, GLenum target);
+    Texture(const string& name, GLuint id, int width, int height, GLenum target);
 
     GLuint m_id;
     int m_width, m_height;
     GLenum m_target;
 };
 
-#endif
+}
 
+#endif

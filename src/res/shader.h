@@ -5,9 +5,11 @@
 
 #include "resources.h"
 
-class DataFile;
+namespace fs { class DataFile; }
 
-class ShaderResource : public Resource {
+namespace resource {
+
+class Shader : public Resource {
 public:
     /**
      * Load a shader from a datafile.
@@ -18,18 +20,18 @@ public:
      * @param datafile the datafile from which to load the shader
      * @param filename shader file name (inside datafile)
      * @param type resource type. Must be one of the _SHADER types.
-     * @return new ShaderResource
+     * @return new Shader
      * @throw ResourceException in case of error
      */
-    static ShaderResource *load(const string& name, DataFile &datafile, const string& filename, Type type);
+    static Shader *load(const string& name, fs::DataFile &datafile, const string& filename, Type type);
 
-    ShaderResource() = delete;
-    ~ShaderResource();
+    Shader() = delete;
+    ~Shader();
 
     GLuint id() const { return m_id; }
 
 private:
-    ShaderResource(const string& name, Type type, GLuint id);
+    Shader(const string& name, Type type, GLuint id);
 
     GLuint m_id;
 };
@@ -37,10 +39,10 @@ private:
 /**
  * A shader program
  */
-class ProgramResource : public Resource {
+class Program : public Resource {
 public:
-    ProgramResource() = delete;
-    ~ProgramResource();
+    Program() = delete;
+    ~Program();
 
     /**
      * Create a new program.
@@ -50,7 +52,7 @@ public:
      *
      * @param name resource name
      */
-    static ProgramResource *make(const string& name);
+    static Program *make(const string& name);
 
     /**
      * Add a shader to this program.
@@ -59,7 +61,7 @@ public:
      * @param shader shader to add
      * @return reference to this
      */
-    void addShader(ShaderResource *shader);
+    void addShader(Shader *shader);
 
     /**
      * Link the program.
@@ -70,11 +72,12 @@ public:
     GLuint id() const { return m_id; }
 
 private:
-    ProgramResource(const string& name, GLuint id);
+    Program(const string& name, GLuint id);
 
     GLuint m_id;
     bool m_linked;
 };
 
-#endif
+}
 
+#endif

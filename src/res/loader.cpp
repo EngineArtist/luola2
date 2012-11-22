@@ -6,6 +6,8 @@
 #include "model.h"
 #include "font.h"
 
+namespace resource {
+
 namespace {
 /**
  * Convenience function: Convert a conftree node to a string vector
@@ -60,14 +62,14 @@ glm::vec3 node2vec3(const conftree::Node &node, const glm::vec3 &def=glm::vec3(0
 }
 }
 
-void ResourceLoader::parseHeader(DataFile &datafile, const conftree::Node &header)
+void Loader::parseHeader(fs::DataFile &datafile, const conftree::Node &header)
 {
     // Load subresources, if defined.
     conftree::Node includes = header.opt("include");
     if(includes.type() != conftree::Node::BLANK) {
         std::vector<string> subresources = node2vec(includes);
         for(const string &sr : subresources) {
-            ResourceLoader subloader(datafile, sr);
+            Loader subloader(datafile, sr);
             for(const string &key : subloader.m_node.itemSet())
                 m_node.insert(key, subloader.m_node.at(key));
 
@@ -83,7 +85,7 @@ void ResourceLoader::parseHeader(DataFile &datafile, const conftree::Node &heade
     }
 }
 
-ResourceLoader::ResourceLoader(DataFile& datafile, const string& filename)
+Loader::Loader(fs::DataFile& datafile, const string& filename)
     : m_datafile(datafile)
 {
     // Load configuration file
@@ -109,12 +111,12 @@ ResourceLoader::ResourceLoader(DataFile& datafile, const string& filename)
     }
 }
 
-Resource *ResourceLoader::load(const string& name)
+Resource *Loader::load(const string& name)
 {
     // First step: see if the resource has already been loaded
     try {
         return Resources::getInstance().getResource(name);
-    } catch(const ResourceNotFound &ex) {
+    } catch(const NotFound &ex) {
         // not loaded yet
     }
 
@@ -122,7 +124,7 @@ Resource *ResourceLoader::load(const string& name)
     try {
         resnode = m_node.at(name);
     } catch(const conftree::BadNode &ex) {
-        throw ResourceNotFound(m_datafile.name(), name);
+        throw NotFound(m_datafile.name(), name);
     }
 
     // Check resource type and dispatch to relevant handler
@@ -149,9 +151,9 @@ Resource *ResourceLoader::load(const string& name)
         throw ResourceException(m_datafile.name(), name, "Unknown resource type: " + type);
 }
 
-Resource *ResourceLoader::loadProgram(const conftree::Node &node, const string &name)
+Resource *Loader::loadProgram(const conftree::Node &node, const string &name)
 {
-    ProgramResource *pr = ProgramResource::make(name);
+    Program *pr = Program::make(name);
 
     const conftree::Node &shaders = node.at("shaders");
     for(unsigned int i=0;i<shaders.items();++i) {
@@ -161,10 +163,10 @@ Resource *ResourceLoader::loadProgram(const conftree::Node &node, const string &
         if(!sr) {
             Resources::getInstance().unloadResource(pr->name());
             return nullptr;
-        } else if(!dynamic_cast<ShaderResource*>(sr)) {
+        } else if(!dynamic_cast<Shader*>(sr)) {
             throw ResourceException(m_datafile.name(), sr->name(), "resource is not a shader!");
         }
-        pr->addShader(static_cast<ShaderResource*>(sr));
+        pr->addShader(static_cast<Shader*>(sr));
     }
 
     pr->link();
@@ -172,7 +174,7 @@ Resource *ResourceLoader::loadProgram(const conftree::Node &node, const string &
     return pr;
 }
 
-Resource *ResourceLoader::loadModel(const conftree::Node &node, const string &name)
+Resource *Loader::loadModel(const conftree::Node &node, const string &name)
 {
     Resource *mesh = load(node.at("mesh").value());
     if(mesh->type() != Resource::MESH)
@@ -182,7 +184,7 @@ Resource *ResourceLoader::loadModel(const conftree::Node &node, const string &na
     if(shader->type() != Resource::SHADER_PROGRAM)
         throw ResourceException(m_datafile.name(), name, shader->name() + " is not a shader program!");
 
-    ModelResource::SamplerTextures textures;
+    Model::SamplerTextures textures;
     conftree::Node texnodes = node.opt("textures");
     for(unsigned int i=0;i<texnodes.items();++i) {
         const conftree::Node &n = texnodes.at(i);
@@ -191,20 +193,20 @@ Resource *ResourceLoader::loadModel(const conftree::Node &node, const string &na
         if(tr->type() != Resource::TEXTURE)
             throw ResourceException(m_datafile.name(), name, shader->name() + " is not a texture!");
 
-        textures.push_back(ModelResource::SamplerTexture(
+        textures.push_back(Model::SamplerTexture(
             n.at("sampler").value(),
-            static_cast<TextureResource*>(tr)
+            static_cast<Texture*>(tr)
             ));
     }
 
-    return ModelResource::make(
+    return Model::make(
         name,
-        static_cast<MeshResource*>(mesh),
-        static_cast<ProgramResource*>(shader),
+        static_cast<Mesh*>(mesh),
+        static_cast<Program*>(shader),
         textures);
 }
 
-Resource *ResourceLoader::loadFont(const conftree::Node &node, const string &name)
+Resource *Loader::loadFont(const conftree::Node &node, const string &name)
 {
     Resource *texture = load(node.at("texture").value());
     if(texture->type() != Resource::TEXTURE)
@@ -214,15 +216,15 @@ Resource *ResourceLoader::loadFont(const conftree::Node &node, const string &nam
     if(shader->type() != Resource::SHADER_PROGRAM)
         throw ResourceException(m_datafile.name(), name, shader->name() + " is not a shader program!");
 
-    return FontResource::load(
+    return Font::load(
         name,
         m_datafile,
         node.at("description").value(),
-        static_cast<TextureResource*>(texture),
-        static_cast<ProgramResource*>(shader));
+        static_cast<Texture*>(texture),
+        static_cast<Program*>(shader));
 }
 
-Resource *ResourceLoader::loadShader(const conftree::Node &node, const string &name)
+Resource *Loader::loadShader(const conftree::Node &node, const string &name)
 {
     string stype = node.at("subtype").value();
     Resource::Type type;
@@ -235,7 +237,7 @@ Resource *ResourceLoader::loadShader(const conftree::Node &node, const string &n
     else
         throw ResourceException(m_datafile.name(), name, "Unrecognized shader type: " + stype);
 
-    return ShaderResource::load(
+    return Shader::load(
         name,
         m_datafile,
         node.at("src").value(),
@@ -243,26 +245,28 @@ Resource *ResourceLoader::loadShader(const conftree::Node &node, const string &n
         );
 }
 
-Resource *ResourceLoader::loadTexture(const conftree::Node &node, const string &name)
+Resource *Loader::loadTexture(const conftree::Node &node, const string &name)
 {
-    return TextureResource::load(
+    return Texture::load(
         name,
         m_datafile,
         node.at("src").value()
         );
 }
 
-Resource *ResourceLoader::loadMesh(const conftree::Node &node, const string &name)
+Resource *Loader::loadMesh(const conftree::Node &node, const string &name)
 {
     string src = node.at("src").value();
     glm::vec3 offset = node2vec3(node.opt("offset"));
     glm::vec3 scale = node2vec3(node.opt("scale"), glm::vec3(1.0f));
 
-    return MeshResource::load(
+    return Mesh::load(
         name,
         m_datafile,
         src,
         offset,
         scale
         );
+}
+
 }

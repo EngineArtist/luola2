@@ -55,12 +55,12 @@ class Ship {
 public:
     Ship() = default;
 
-	/**
-	 * Make a ship with the given customizations.
-	 *
-	 * @param conf ship configuration
-	 * @return ship instance
-	 */
+    /**
+     * Make a ship with the given customizations.
+     *
+     * @param conf ship configuration
+     * @return ship instance
+     */
     static Ship make(const gameinit::ShipConf &conf);
 
     /**
@@ -71,7 +71,7 @@ public:
     const Physical &physics() const { return m_physics; }
 
     /**
-     * Add a batteryG to the ship
+     * Add a battery to the ship
      *
      * @param capacity battery capacity
      * @param chargerate battery charge rate
@@ -98,6 +98,13 @@ public:
      * @return maximum available energy
      */
     float maxEnergy() const { return m_maxenergy; }
+
+    /**
+     * Get the the direction the ship's nose is pointing at.
+     *
+     * @return angle in range [0..2pi]
+     */
+    float angle() const { return m_angle; }
 
     /// Turning directions
     enum TurnDir { NOTURN, CW, CCW };

@@ -19,17 +19,34 @@ public:
     virtual ~Weapon();
 
     /**
-     * Return the number of physics ticks this weapon requires to cool off
-     * between shots.
+     * The time the weapon requires to cool off between shots.
      *
-     * @return number of ticks
+     * @return cooloff time in physics ticks
      */
     int cooloffPeriod() const { return m_cooloff; }
 
+    /**
+     * The energy consumed by a single shot.
+     *
+     * @return energy requirement
+     */
+    float energy() const { return m_energy; }
+
+    /**
+     * Fire the weapon.
+     *
+     * This function call will make changes to the ship and/or the world.
+     * Typically, the change is the addition of a projectile.
+     * 
+     * @param projectile the projectile type (ignored by some weapons)
+     * @param ship the ship that fired the weapon
+     * @param world game state
+     */
     virtual void fire(const ProjectileDef *projectile, Ship &ship, World &world) const = 0;
 
 private:
     int m_cooloff;
+    float m_energy;
 };
 
 class WeaponFactoryBase

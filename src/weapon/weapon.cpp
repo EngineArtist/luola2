@@ -9,6 +9,8 @@ Weapon::Weapon(const conftree::Node &node)
 {
     float cooloff = node.opt("cooloff").floatValue(0.0) * Physical::TPS;
     m_cooloff = std::round(cooloff);
+
+    m_energy = node.at("energy").floatValue();
 }
 
 Weapon::~Weapon()

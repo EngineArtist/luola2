@@ -21,7 +21,7 @@ public:
      *
      * The value is premultiplied with the physics timestep
      * 
-     * @return amount of energy generated
+     * @return amount of energy generated in a single physics tick
      */
     float energy() const { return m_energy; }
 

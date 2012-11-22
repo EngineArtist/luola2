@@ -23,7 +23,7 @@ void Equipments::loadAll(fs::DataFile &df, const string &filename)
     Equipments &e = getInstance();
     for(const string &key : node.itemSet()) {
         const conftree::Node &n = node.at(key);
-        e.m_equipment[key] = e.m_factories.at(n.at("codebase").value())->make(node);
+        e.m_equipment[key] = e.m_factories.at(n.at("codebase").value())->make(n);
     }
 }
 

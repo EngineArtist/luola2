@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "../util/conftree.h"
 #include "../world.h"
 #include "weapon.h"
@@ -19,9 +21,12 @@ public:
     void fire(const ProjectileDef *projectile, Ship &ship, World &world) const
     {
         assert(projectile);
-        glm::vec2 vel = ship.physics().velocity();
 
-        Projectile p = projectile->make(ship.physics().position(), vel);
+        Projectile p = projectile->make(ship.physics().position(), ship.physics().velocity());
+        p.physics().addImpulse(glm::vec2(
+            cos(ship.angle()) * m_force,
+            sin(ship.angle()) * m_force
+            ));
 
         world.addProjectile(p);
     }

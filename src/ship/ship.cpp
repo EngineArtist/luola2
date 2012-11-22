@@ -40,7 +40,7 @@ Ship::Ship(const ShipDef *def,
     }
 
     // Calculate cached values
-    m_maxenergy = power->energy() / Physical::TIMESTEP + m_battery;
+    m_maxenergy = power->energy() + m_battery;
     m_energy = m_maxenergy;
 
     setAngle(0.0f);
@@ -160,14 +160,14 @@ void Ship::shipStep(World &world)
     for(unsigned int i=0;i<m_weapons.size();++i) {
         if(m_weapons[i].cooloff > 0) {
             --m_weapons[i].cooloff;
-        } else if(m_state_trigger[i] && m_weapons[i].weapon) {
-            // Trigger pressed and weapon cooled off: fire
+        } else if(m_state_trigger[i] && m_weapons[i].weapon && energy >= m_weapons[i].weapon->energy()) {
             m_weapons[i].weapon->fire(m_weapons[i].projectile, *this, world);
             m_weapons[i].cooloff = m_weapons[i].weapon->cooloffPeriod();
+            energy -= m_weapons[i].weapon->energy();
         }
     }
 
     // Charge battery with leftover energy
     float de = std::min(energy - m_energy, m_battery_charge_rate);
-    m_energy = std::max(std::min(m_energy + de, m_battery), 0.0f);
+    m_energy = std::max(std::min(m_energy + de, m_maxenergy), 0.0f);
 }

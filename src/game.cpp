@@ -82,6 +82,8 @@ void gameloop(const gameinit::Hotseat &init)
             else
                 ship->turn(Ship::NOTURN);
 
+            ship->trigger(1, glfwGetKey(GLFW_KEY_SPACE) == GLFW_PRESS);
+
             world.step();
             time_accumulator -= Physical::TIMESTEP;
         }

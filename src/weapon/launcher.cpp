@@ -1,6 +1,7 @@
 #include "../util/conftree.h"
-#include "../ship/ship.h"
+#include "../world.h"
 #include "weapon.h"
+#include "../projectile/projectiledef.h"
 
 /**
  * A generic launcher for projectiles.
@@ -13,6 +14,16 @@ public:
     {
         // launch force
         m_force = node.at("force").floatValue();
+    }
+
+    void fire(const ProjectileDef *projectile, Ship &ship, World &world) const
+    {
+        assert(projectile);
+        glm::vec2 vel = ship.physics().velocity();
+
+        Projectile p = projectile->make(ship.physics().position(), vel);
+
+        world.addProjectile(p);
     }
 
 private:

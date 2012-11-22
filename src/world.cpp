@@ -5,10 +5,11 @@
 
 void World::step()
 {
+    // Ships
     for(unsigned int i=0;i<m_ships.size();++i) {
         Physical &obj = m_ships[i].physics();
 
-        m_ships[i].shipStep();
+        m_ships[i].shipStep(*this);
         obj.step(*this);
 
         // Boundary collisions
@@ -27,6 +28,23 @@ void World::step()
                 std::cout << "collision " << i << "--" << j << std::endl;
             }
         }
+    }
+
+    // Projectiles
+    for(unsigned int i=0;i<m_projectiles.size();++i) {
+        Physical &obj = m_projectiles[i].physics();
+
+        obj.step(*this);
+
+        // Boundary collisions
+        glm::vec2 vel = obj.velocity();
+
+        if(obj.position().x<-10 || obj.position().x>10)
+            vel.x = -vel.x;
+        if(obj.position().y<-7.5 || obj.position().y>7.5)
+            vel.y = -vel.y;
+
+        obj.setVelocity(vel);
     }
 }
 
@@ -62,6 +80,11 @@ void World::addShip(int player, const Ship &ship)
 {
     assert(player > 0);
     m_ships.push_back(ship);
+}
+
+void World::addProjectile(const Projectile &projectile)
+{
+    m_projectiles.push_back(projectile);
 }
 
 Ship *World::getPlayerShip(int player)

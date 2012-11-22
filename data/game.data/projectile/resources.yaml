@@ -1,0 +1,36 @@
+autoload:
+    - projectile.blastingbolt.model
+---
+
+projectile.blastingbolt.model:
+    type: model
+    mesh: projectile.blastingbolt.mesh
+    shader: projectile.shader
+    textures:
+        - sampler: myTextureSampler
+          texture: projectile.blastingbolt.texture
+
+projectile.blastingbolt.mesh:
+    type: mesh
+    src: projectile/test.mesh
+
+projectile.blastingbolt.texture:
+    type: texture
+    src: projectile/test.png
+
+projectile.shader:
+    type: program
+    shaders:
+        - projectile.shader.vertex
+        - projectile.shader.fragment
+
+projectile.shader.vertex:
+    type: shader
+    subtype: vertex
+    src: projectile/vertex.shader
+
+projectile.shader.fragment:
+    type: shader
+    subtype: fragment
+    src: projectile/fragment.shader
+

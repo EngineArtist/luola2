@@ -9,6 +9,9 @@ using std::string;
 namespace conftree { class Node; }
 
 class DataFile;
+class Ship;
+class World;
+class ProjectileDef;
 
 class Weapon {
 public:
@@ -22,6 +25,8 @@ public:
      * @return number of ticks
      */
     int cooloffPeriod() const { return m_cooloff; }
+
+    virtual void fire(const ProjectileDef *projectile, Ship &ship, World &world) const = 0;
 
 private:
     int m_cooloff;

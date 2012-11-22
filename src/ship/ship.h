@@ -9,6 +9,7 @@ using std::string;
 
 #include "../physics.h"
 
+class World;
 class ModelResource;
 class ShipDef;
 class Engine;
@@ -130,8 +131,10 @@ public:
      *
      * This runs the ship's internal systems (engine, turning, weapons, etc.)
      * Physics simulation is done by calling physics().step()
+     *
+     * @param world the game state
      */
-    void shipStep();
+    void shipStep(World &world);
 
     /**
      * Set the direction the ship's nose is pointing at.

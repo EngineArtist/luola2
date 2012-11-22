@@ -32,6 +32,13 @@ public:
      */
     const ProjectileDef *def() const { return m_def; }
 
+    /**
+     * Draw the projectile
+     * 
+     * @param transform
+     */
+    void draw(const glm::mat4 &transform) const;
+
 private:
     Physical m_physics;
     const ProjectileDef *m_def;

@@ -5,6 +5,7 @@
 
 #include "terrain/terrains.h"
 #include "ship/ship.h"
+#include "projectile/projectile.h"
 
 /**
  * Game world state
@@ -48,6 +49,13 @@ public:
      */
     void addShip(int player, const Ship &ship);
 
+    /**
+     * Add a new projectile to the world.
+     *
+     * @param projectile the projectile
+     */
+    void addProjectile(const Projectile &projectile);
+
     // TODO
     Ship *getPlayerShip(int player);
 
@@ -86,7 +94,9 @@ public:
     void makeHole(const terrain::ConvexPolygon &hole);
 
 private:
+    // Game objects
     std::vector<Ship> m_ships;
+    std::vector<Projectile> m_projectiles;
 
     // Root zone properties
     terrain::ZoneProps m_rootzone;

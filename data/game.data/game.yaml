@@ -12,4 +12,4 @@ ship:
     engines: ship/engines.yaml
     equipment: ship/equipment.yaml
     weapons: ship/weapons.yaml
-    projectiles: ship/projectiles.yaml
+    projectiles: projectile/projectiles.yaml

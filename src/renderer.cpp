@@ -37,12 +37,8 @@ void Renderer::render(double frametime) const
     for(const Ship &ship : m_world.m_ships)
         ship.draw(PV);
 
-#if 0
-    for(int i=0;i<OBJS;++i) {
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(objects[i].position().x, objects[i].position().y, 0));
-        ship1->render(PV * model);
-    }
-#endif
+    for(const Projectile &p : m_world.m_projectiles)
+        p.draw(PV);
 
     m_font->text("FPS: %.1f", 1.0 / frametime)
     .scale(0.5).pos(1,1).align(TextRenderer::RIGHT).color(1,1,0)

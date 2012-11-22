@@ -6,9 +6,12 @@
 
 using std::string;
 
+#include "projectile.h"
+
 namespace conftree { class Node; }
 
 class DataFile;
+class ModelResource;
 
 /**
  * Projectile definition.
@@ -34,9 +37,26 @@ public:
      */
     float radius() const { return m_radius; }
 
+    /**
+     * Get the model for rendering this projectile
+     *
+     * @return model
+     */
+    const ModelResource *model() const { return m_model; }
+
+    /**
+     * Create projectile
+     *
+     * @param pos initial position
+     * @param vel inherited velocity
+     */
+    virtual Projectile make(const glm::vec2 &pos, const glm::vec2 &vel) const;
+
 private:
     float m_mass;
     float m_radius;
+
+    ModelResource *m_model;
 };
 
 class ProjectileFactoryBase

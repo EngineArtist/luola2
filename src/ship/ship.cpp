@@ -122,7 +122,7 @@ void Ship::trigger(int weapon, bool on)
     m_state_trigger[weapon-1] = on;
 }
 
-void Ship::shipStep()
+void Ship::shipStep(World &world)
 {
     // Power generation
     float energy = m_energy + m_power->energy();
@@ -162,6 +162,8 @@ void Ship::shipStep()
             --m_weapons[i].cooloff;
         } else if(m_state_trigger[i] && m_weapons[i].weapon) {
             // Trigger pressed and weapon cooled off: fire
+            m_weapons[i].weapon->fire(m_weapons[i].projectile, *this, world);
+            m_weapons[i].cooloff = m_weapons[i].weapon->cooloffPeriod();
         }
     }
 

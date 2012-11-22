@@ -2,16 +2,23 @@
 
 #include "../util/conftree.h"
 #include "../ship/exception.h"
+#include "../res/model.h"
 #include "projectiledef.h"
 
 ProjectileDef::ProjectileDef(const conftree::Node &node)
 {
     m_mass = node.at("mass").floatValue();
     m_radius = node.at("radius").floatValue();
+    m_model = Resources::get<ModelResource>(node.at("model").value());
 }
 
 ProjectileDef::~ProjectileDef()
 {
+}
+
+Projectile ProjectileDef::make(const glm::vec2 &pos, const glm::vec2 &vel) const
+{
+    return Projectile(this, pos, vel);
 }
 
 ProjectileFactoryBase::~ProjectileFactoryBase()

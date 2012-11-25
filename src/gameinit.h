@@ -48,6 +48,11 @@ struct ShipConf {
 class Hotseat {
 public:
     /**
+     * Maximum number of players in a hotseat game
+     */
+    static const int MAX_PLAYERS = 4;
+
+    /**
      * Load game initialization data from an external file.
      *
      * This is typically used while testing the game to quickly launch
@@ -69,7 +74,6 @@ public:
     /**
      * Add a ship
      *
-     * @param player the player to whom the ship belongs to [1..4]
      * @param shipconf ship configuration
      */
     void addShip(const ShipConf &shipconf);

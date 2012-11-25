@@ -73,7 +73,7 @@ public:
     /**
      * Get the number of the player this ship belongs to.
      *
-     * For hotseat games, the player number is in the range 1..4.
+     * For hotseat games, the player number is in the range 1..MAX_PLAYERS.
      *
      * @return player number
      */

@@ -1,4 +1,5 @@
 #include <ostream>
+
 #include <boost/lexical_cast.hpp>
 
 #include "util/conftree.h"
@@ -62,10 +63,10 @@ Hotseat Hotseat::loadFromFile(const string &filename)
     Hotseat hs;
 
     // Load players
-    static const char *PLAYERS[] = {"player1", "player2", "player3", "player4"};
-    for(unsigned int i=0;i<4;++i) {
-        if(node.hasNode(PLAYERS[i]))
-            hs.addShip(parseShipConf(i+1, node.at(PLAYERS[i])));
+    for(int i=1;i<=MAX_PLAYERS;++i) {
+        string nodename = "player" + boost::lexical_cast<string>(i);
+        if(node.hasNode(nodename))
+            hs.addShip(parseShipConf(i, node.at(nodename)));
     }
 
     return hs;

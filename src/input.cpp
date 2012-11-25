@@ -2,12 +2,13 @@
 #include <unordered_map>
 #include <array>
 
+#include "gameinit.h"
 #include "input.h"
 
 namespace input {
 
 namespace {
-    std::array<PlayerInput, 4> INPUTS;
+    std::array<PlayerInput, gameinit::Hotseat::MAX_PLAYERS> INPUTS;
 
     enum KeyAction {
         UP, DOWN, LEFT, RIGHT, TRIGGER1, TRIGGER2

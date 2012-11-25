@@ -64,30 +64,29 @@ void gameloop(const gameinit::Hotseat &init)
 
         time_accumulator += frame_time;
 
+        // Interaction
+        for(int i=1;i<=gameinit::Hotseat::MAX_PLAYERS;++i) {
+            input::PlayerInput &pi = input::getPlayerInput(i);
+            if(pi.isChanged()) {
+                Ship *ship = world.getPlayerShip(i);
+                if(ship) {
+                    ship->thrust(pi.axisY() > 0);
+                    if(pi.axisX() < 0)
+                        ship->turn(Ship::CCW);
+                    else if(pi.axisX() > 0)
+                        ship->turn(Ship::CW);
+                    else
+                        ship->turn(Ship::NOTURN);
+
+                    ship->trigger(1, pi.trigger1());
+                    ship->trigger(2, pi.trigger2());
+                }
+                pi.clear();
+            }
+        }
+
         // Physics
         while(time_accumulator >= Physical::TIMESTEP) {
-            // Interaction
-            for(int i=1;i<=1;++i) {
-                input::PlayerInput &pi = input::getPlayerInput(i);
-                if(pi.isChanged()) {
-                    Ship *ship = world.getPlayerShip(i);
-                    if(ship) {
-                        ship->thrust(pi.axisY() > 0);
-                        if(pi.axisX() < 0)
-                            ship->turn(Ship::CCW);
-                        else if(pi.axisX() > 0)
-                            ship->turn(Ship::CW);
-                        else
-                            ship->turn(Ship::NOTURN);
-
-                        ship->trigger(1, pi.trigger1());
-                        ship->trigger(2, pi.trigger2());
-                    }
-                    pi.clear();
-                }
-            }
-
-            // Simulation step
             world.step();
             time_accumulator -= Physical::TIMESTEP;
         }

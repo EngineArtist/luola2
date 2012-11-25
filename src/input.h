@@ -95,7 +95,11 @@ private:
 /**
  * Get the input device status buffer for the player
  *
- * @param player player number (1..4)
+ * Note. The player number is the local player number in range 1..Hotseat::MAX_PLAYERS
+ * In a network game, the player's actual number may be something else, so the local
+ * number must be mapped to the true number.
+ *
+ * @param player player number (1..Hotseat::MAX_PLAYERS)
  * @return player input
  */
 PlayerInput &getPlayerInput(int player);

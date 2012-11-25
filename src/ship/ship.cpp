@@ -12,13 +12,15 @@
 #include "../weapon/weapon.h"
 #include "../projectile/projectiledef.h"
 
-Ship::Ship(const ShipDef *def,
+Ship::Ship(int player, int team,
+           const ShipDef *def,
            const Engine *engine,
            const PowerPlant *power,
            const std::vector<const Equipment*> &equipment,
            const ShipWeapons &weapons
           )
-    : m_turnrate(def->turningRate() * Physical::TIMESTEP),
+    : m_player(player), m_team(team),
+      m_turnrate(def->turningRate() * Physical::TIMESTEP),
       m_engine(engine),
       m_power(power),
       m_weapons(weapons),
@@ -72,7 +74,7 @@ Ship Ship::make(const gameinit::ShipConf &shipconf)
         weapons[i].cooloff = 0;
     }
 
-    return Ship(hull, engine, power, equipment, weapons);
+    return Ship(shipconf.player, shipconf.team, hull, engine, power, equipment, weapons);
 }
 
 void Ship::addBattery(float capacity, float chargerate)

@@ -76,9 +76,8 @@ bool World::checkTerrainCollision(const terrain::Point &p, float r, const glm::v
     return false;
 }
 
-void World::addShip(int player, const Ship &ship)
+void World::addShip(const Ship &ship)
 {
-    assert(player > 0);
     m_ships.push_back(ship);
 }
 
@@ -89,8 +88,13 @@ void World::addProjectile(const Projectile &projectile)
 
 Ship *World::getPlayerShip(int player)
 {
-    // TODO
-    return &m_ships[0];
+    // Simple linear search should be fine here since
+    // the number of ships won't be larger than 4, except in
+    // a network game.
+    for(Ship &s : m_ships)
+        if(s.player() == player)
+            return &s;
+    return nullptr;
 }
 
 void World::addZone(terrain::Zone *zone)

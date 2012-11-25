@@ -41,9 +41,11 @@ namespace {
         return confs;
     }
 
-    ShipConf parseShipConf(const conftree::Node &node)
+    ShipConf parseShipConf(int player, const conftree::Node &node)
     {
         return {
+            player,
+            node.at("team").intValue(),
             node.at("hull").value(),
             node.at("power").value(),
             node.at("engine").value(),
@@ -63,18 +65,15 @@ Hotseat Hotseat::loadFromFile(const string &filename)
     static const char *PLAYERS[] = {"player1", "player2", "player3", "player4"};
     for(unsigned int i=0;i<4;++i) {
         if(node.hasNode(PLAYERS[i]))
-            hs.addShip(i+1, parseShipConf(node.at(PLAYERS[i])));
+            hs.addShip(parseShipConf(i+1, node.at(PLAYERS[i])));
     }
 
     return hs;
 }
 
-void Hotseat::addShip(int player, const ShipConf &shipconf)
+void Hotseat::addShip(const ShipConf &shipconf)
 {
-    if(player < 1 || player > 4)
-        throw GameInitError("Local player number must be in the range [1..4]");
-
-    m_ships.push_back(std::make_pair(player, shipconf));
+    m_ships.push_back(shipconf);
 }
 
 namespace {
@@ -104,15 +103,12 @@ void Hotseat::initialize(World &world) const
     world.addSolid(makeTerrain());
 
     // Add ships
-    for(const std::pair<int, ShipConf> &psc : m_ships) {
-        int player = psc.first;
-        const ShipConf &sc = psc.second;
-
+    for(const ShipConf &sc : m_ships) {
         Ship ship = Ship::make(sc);
         if(sc.position.hasValue())
             ship.physics().setPosition(sc.position.get());
 
-        world.addShip(player, ship);
+        world.addShip(ship);
     }
 }
 

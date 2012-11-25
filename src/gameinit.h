@@ -31,6 +31,8 @@ typedef std::array<WeaponConf, MAX_WEAPONS> WeaponConfs;
  * Configurable ship attributes
  */
 struct ShipConf {
+    int player;
+    int team;
     string hull;
     string power;
     string engine;
@@ -70,10 +72,10 @@ public:
      * @param player the player to whom the ship belongs to [1..4]
      * @param shipconf ship configuration
      */
-    void addShip(int player, const ShipConf &shipconf);
+    void addShip(const ShipConf &shipconf);
 
 private:
-    std::vector<std::pair<int, ShipConf>> m_ships;
+    std::vector<ShipConf> m_ships;
 };
 
 class GameInitError : public std::exception {

@@ -1,6 +1,7 @@
 # Sample quicklaunch file
 
 player1:
+    team: 1
     hull: test
     power: fission
     engine: rocket

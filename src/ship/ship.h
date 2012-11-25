@@ -71,6 +71,26 @@ public:
     const Physical &physics() const { return m_physics; }
 
     /**
+     * Get the number of the player this ship belongs to.
+     *
+     * For hotseat games, the player number is in the range 1..4.
+     *
+     * @return player number
+     */
+    int player() const { return m_player; }
+
+    /**
+     * Get the team ID of this ship.
+     *
+     * The team ID is an arbitrary number used to identify a team.
+     * It is used for scoring, determining end of level conditions,
+     * missile friend-or-foe logic, etc.
+     *
+     * @return team number
+     */
+    int team() const { return m_team; }
+
+    /**
      * Add a battery to the ship
      *
      * @param capacity battery capacity
@@ -155,10 +175,15 @@ private:
     /**
      * Construct a ship
      *
+     * @param player the owner
+     * @param team the team the player belongs to
      * @param def ship definition
      * @param engine ship engine
+     * @param equipment extra equipment
+     * @param weapons weapon definitions
      */
-    Ship(const ShipDef *def,
+    Ship(int player, int team,
+         const ShipDef *def,
          const Engine *engine,
          const PowerPlant *power,
          const std::vector<const Equipment*> &equipment,
@@ -166,6 +191,9 @@ private:
         );
 
     Physical m_physics;
+
+    int m_player;
+    int m_team;
 
     float m_angle;
     float m_turnrate;

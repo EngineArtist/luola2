@@ -47,7 +47,7 @@ public:
      * @param player the player to whom the ship belongs to
      * @param ship the ship to add
      */
-    void addShip(int player, const Ship &ship);
+    void addShip(const Ship &ship);
 
     /**
      * Add a new projectile to the world.

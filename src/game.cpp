@@ -10,6 +10,7 @@
 #include "fs/datafile.h"
 #include "res/loader.h"
 
+#include "input.h"
 #include "physics.h"
 #include "game.h"
 #include "gameinit.h"
@@ -20,13 +21,6 @@
 #include "ship/power.h"
 #include "equipment/equipment.h"
 #include "renderer.h"
-
-void bounds(const glm::vec2 pos, glm::vec2 &vel) {
-    if(pos.x<-10 || pos.x>10)
-        vel.x = -vel.x;
-    if(pos.y<-7.5 || pos.y>7.5)
-        vel.y = -vel.y;
-}
 
 terrain::ConvexPolygon makeNibblePolygon(float x, float y)
 {
@@ -55,7 +49,7 @@ void gameloop(const gameinit::Hotseat &init)
 
     init.initialize(world);
 
-    Ship *ship = world.getPlayerShip(1);
+    input::initPlayerInputs();
 
     double time_now = glfwGetTime();
     double time_accumulator = 0.0;
@@ -73,21 +67,32 @@ void gameloop(const gameinit::Hotseat &init)
         // Physics
         while(time_accumulator >= Physical::TIMESTEP) {
             // Interaction
-            ship->thrust(glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS);
+            for(int i=1;i<=1;++i) {
+                input::PlayerInput &pi = input::getPlayerInput(i);
+                if(pi.isChanged()) {
+                    Ship *ship = world.getPlayerShip(i);
+                    if(ship) {
+                        ship->thrust(pi.axisY() > 0);
+                        if(pi.axisX() < 0)
+                            ship->turn(Ship::CCW);
+                        else if(pi.axisX() > 0)
+                            ship->turn(Ship::CW);
+                        else
+                            ship->turn(Ship::NOTURN);
 
-            if(glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS)
-                ship->turn(Ship::CCW);
-            else if(glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS)
-                ship->turn(Ship::CW);
-            else
-                ship->turn(Ship::NOTURN);
+                        ship->trigger(1, pi.trigger1());
+                        ship->trigger(2, pi.trigger2());
+                    }
+                    pi.clear();
+                }
+            }
 
-            ship->trigger(1, glfwGetKey(GLFW_KEY_SPACE) == GLFW_PRESS);
-
+            // Simulation step
             world.step();
             time_accumulator -= Physical::TIMESTEP;
         }
 
+        // Testing... To be removed.
         if(glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
             if(!mousedown) {
                 mousedown = true;
@@ -105,4 +110,6 @@ void gameloop(const gameinit::Hotseat &init)
         // Graphics
         renderer.render(frame_time);
     } while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
+
+    input::deinitPlayerInputs();
 }

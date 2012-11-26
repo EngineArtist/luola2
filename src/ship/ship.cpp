@@ -94,6 +94,7 @@ void Ship::draw(const glm::mat4 &transform) const
         glm::degrees(m_angle) - 90,
         axis);
 
+    m_model->prepareRender();
     m_model->render(m);
 }
 

@@ -1,5 +1,5 @@
 blastingbolt:
     codebase: simplebullet
-    model: projectile.blastingbolt.model
+    mesh: 0
     mass: 1
     radius: 0.1

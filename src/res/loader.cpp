@@ -180,7 +180,7 @@ Resource *Loader::loadModel(const conftree::Node &node, const string &name)
     if(mesh->type() != Resource::MESH)
         throw ResourceException(m_datafile.name(), name, mesh->name() + " is not a mesh!");
 
-    Resource *shader = load(node.at("shader").value());;
+    Resource *shader = load(node.at("shader").value());
     if(shader->type() != Resource::SHADER_PROGRAM)
         throw ResourceException(m_datafile.name(), name, shader->name() + " is not a shader program!");
 
@@ -199,11 +199,15 @@ Resource *Loader::loadModel(const conftree::Node &node, const string &name)
             ));
     }
 
+    bool blend = node.opt("blend").value("false") == "true";
+
     return Model::make(
         name,
         static_cast<Mesh*>(mesh),
         static_cast<Program*>(shader),
-        textures);
+        textures,
+        blend
+        );
 }
 
 Resource *Loader::loadFont(const conftree::Node &node, const string &name)
@@ -256,14 +260,27 @@ Resource *Loader::loadTexture(const conftree::Node &node, const string &name)
 
 Resource *Loader::loadMesh(const conftree::Node &node, const string &name)
 {
-    string src = node.at("src").value();
+    conftree::Node srcnode = node.at("src");
+    std::unordered_map<string, string> sources;
+    switch(srcnode.type()) {
+        case conftree::Node::SCALAR:
+            sources["0"] = srcnode.value();
+            break;
+        case conftree::Node::MAP:
+            for(const string &mesh : srcnode.itemSet())
+                sources[mesh] = srcnode.at(mesh).value();
+            break;
+        default:
+            throw ResourceException(m_datafile.name(), name, "src must be a scalar or a map!");
+    }
+
     glm::vec3 offset = node2vec3(node.opt("offset"));
     glm::vec3 scale = node2vec3(node.opt("scale"), glm::vec3(1.0f));
 
     return Mesh::load(
         name,
         m_datafile,
-        src,
+        sources,
         offset,
         scale
         );

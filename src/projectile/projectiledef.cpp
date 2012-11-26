@@ -7,9 +7,11 @@
 
 ProjectileDef::ProjectileDef(const conftree::Node &node)
 {
+    const resource::Model *model = Projectiles::getModel();
+
     m_mass = node.at("mass").floatValue();
     m_radius = node.at("radius").floatValue();
-    m_model = resource::get<resource::Model>(node.at("model").value());
+    m_mesh = model->mesh()->submeshOffset(node.at("mesh").value());
 }
 
 ProjectileDef::~ProjectileDef()
@@ -44,6 +46,16 @@ const ProjectileDef *Projectiles::get(const string &name)
     } catch(const std::out_of_range &ex) {
         throw ShipDefException("projectile \"" + name + "\" not defined!");
     } 
+}
+
+void Projectiles::setModel(const string &name)
+{
+    getInstance().m_model = resource::get<resource::Model>(name);
+}
+
+const resource::Model *Projectiles::getModel()
+{
+    return getInstance().m_model;
 }
 
 void Projectiles::registerFactory(const string &name, ProjectileFactoryBase *factory)

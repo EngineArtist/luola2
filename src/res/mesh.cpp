@@ -19,22 +19,19 @@ using std::endl;
 #include "../fs/datafile.h"
 
 namespace resource {
- 
-Mesh *Mesh::load(
-    const string& name,
-    fs::DataFile &datafile,
-    const string &filename,
-    const glm::vec3 &offset,
-    const glm::vec3 &scale
-    )
-{
-#ifndef NDEBUG
-    cerr << "Loading mesh " << filename << "..." << endl;
-#endif
 
-    fs::DataStream ds(datafile, filename);
+namespace {
+struct MeshData {
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normal;
+    std::vector<glm::vec2> uv;
+    std::vector<GLushort> triangle;
+};
+
+void loadMesh(fs::DataFile &datafile, const string &filename, MeshData &data)
+    {    fs::DataStream ds(datafile, filename);
     if(ds->isError())
-        throw ResourceException(datafile.name(), name, ds->errorString());
+        throw ResourceException(datafile.name(), filename, ds->errorString());
 
     enum {
         EXPECT_VERTEX_HEADER,
@@ -42,17 +39,15 @@ Mesh *Mesh::load(
         EXPECT_TRIANGLE_HEADER,
         EXPECT_TRIANGLE,
         DONE
-        } state = EXPECT_VERTEX_HEADER;
+    } state = EXPECT_VERTEX_HEADER;
+
     int expecting = 0;
     bool has_normal = false;
     bool has_uv = false;
     bool has_color = false;
 
-    std::vector<glm::vec3> vertex;
-    std::vector<glm::vec3> normal;
-    std::vector<glm::vec2> uv;
-    std::vector<GLushort> triangle;
-
+    const int base = data.vertex.size();
+ 
     string line;
     while(state != DONE) {
         std::getline(ds, line);
@@ -65,50 +60,50 @@ Mesh *Mesh::load(
         switch(state) {
             case EXPECT_VERTEX_HEADER:
                 if(tokens.size() < 2 || tokens.size() > 5)
-                    throw ResourceException(datafile.name(), name,
-                        "Expected 2-5 tokens on mesh header!");
+                    throw ResourceException(datafile.name(), filename,
+                                            "Expected 2-5 tokens on mesh header!");
 
-                if(tokens[1] != "vertices")
-                    throw ResourceException(datafile.name(), name,
-                        "First token of mesh file is not \"vertices\"!");
+                    if(tokens[1] != "vertices")
+                        throw ResourceException(datafile.name(), filename,
+                                                "First token of mesh file is not \"vertices\"!");
 
-                expecting = atoi(tokens[0].c_str());
-                for(unsigned int t=2;t<tokens.size();++t) {
-                    if(tokens[t] == "N")
-                        has_normal = true;
-                    else if(tokens[t] == "UV")
-                        has_uv = true;
-                    else if(tokens[t] == "C")
-                        has_color = true;
-                    else
-                        throw ResourceException(datafile.name(), name,
-                            "First vertex header flag: " + tokens[t]);
-                }
-                vertex.reserve(expecting);
-                state = EXPECT_VERTEX;
-                break;
+                        expecting = atoi(tokens[0].c_str());
+                    for(unsigned int t=2;t<tokens.size();++t) {
+                        if(tokens[t] == "N")
+                            has_normal = true;
+                        else if(tokens[t] == "UV")
+                            has_uv = true;
+                        else if(tokens[t] == "C")
+                            has_color = true;
+                        else
+                            throw ResourceException(datafile.name(), filename,
+                                                    "First vertex header flag: " + tokens[t]);
+                    }
+                   state = EXPECT_VERTEX;
+                    break;
 
             case EXPECT_VERTEX:
-                vertex.push_back((glm::vec3(
+                data.vertex.push_back(glm::vec3(
                     atof(tokens.at(0).c_str()),
                     atof(tokens.at(1).c_str()),
                     atof(tokens.at(2).c_str())
-                    ) + offset) * scale);
+                    ));
+
                 {
                     int i=3;
                     if(has_normal) {
-                        normal.push_back(glm::vec3(
+                        data.normal.push_back(glm::vec3(
                             atof(tokens.at(i+0).c_str()),
-                            atof(tokens.at(i+1).c_str()),
-                            atof(tokens.at(i+2).c_str())
-                            ));
+                                                   atof(tokens.at(i+1).c_str()),
+                                                   atof(tokens.at(i+2).c_str())
+                        ));
                         i += 3;
                     }
                     if(has_uv) {
-                        uv.push_back(glm::vec2(
+                        data.uv.push_back(glm::vec2(
                             atof(tokens.at(i+0).c_str()),
-                            atof(tokens.at(i+1).c_str())
-                            ));
+                                               atof(tokens.at(i+1).c_str())
+                        ));
                         i += 2;
                     }
                     // TODO color
@@ -120,18 +115,17 @@ Mesh *Mesh::load(
 
             case EXPECT_TRIANGLE_HEADER:
                 if(tokens.at(1) != "triangles")
-                    throw ResourceException(datafile.name(), name,
-                        "Expected triangle header!");
+                    throw ResourceException(datafile.name(), filename,
+                                            "Expected triangle header!");
 
-                expecting = atoi(tokens.at(0).c_str());
-                triangle.reserve(expecting);
+                    expecting = atoi(tokens.at(0).c_str());
                 state = EXPECT_TRIANGLE;
                 break;
 
             case EXPECT_TRIANGLE:
-                triangle.push_back(atoi(tokens.at(0).c_str()));
-                triangle.push_back(atoi(tokens.at(1).c_str()));
-                triangle.push_back(atoi(tokens.at(2).c_str()));
+                data.triangle.push_back(base + atoi(tokens.at(0).c_str()));
+                data.triangle.push_back(base + atoi(tokens.at(1).c_str()));
+                data.triangle.push_back(base + atoi(tokens.at(2).c_str()));
 
                 if(--expecting == 0)
                     state = DONE;
@@ -140,14 +134,44 @@ Mesh *Mesh::load(
             case DONE: break;
         }
     }
+}
+}
 
+Mesh *Mesh::load(
+    const string& name,
+    fs::DataFile &datafile,
+    const std::unordered_map<string, string> &filenames,
+    const glm::vec3 &offset,
+    const glm::vec3 &scale
+    )
+{
+    MeshData data;
+    std::unordered_map<string, MeshSlice> submeshes;
+
+    // Load all meshes
+    for(const auto &submesh : filenames) {
+#ifndef NDEBUG
+        cerr << "Loading mesh " << submesh.second << " (" << name << ")..." << endl;
+#endif
+
+        int off = data.triangle.size();
+        loadMesh(datafile, submesh.second, data);
+        cerr << "submesh " << off << ":" << data.triangle.size() << endl;
+        submeshes[submesh.first] = MeshSlice(off, data.triangle.size()-off);
+    }
+
+    // Apply offset and scale
+    for(glm::vec3 &vec : data.vertex)
+        vec = (vec + offset) * scale;
+
+    // Create vertex, normal, color and UV buffers
     GLuint vbId;
     glGenBuffers(1, &vbId);
     glBindBuffer(GL_ARRAY_BUFFER, vbId);
     glBufferData(
         GL_ARRAY_BUFFER,
-        sizeof(glm::vec3) * vertex.size(),
-        vertex.data(),
+        sizeof(glm::vec3) * data.vertex.size(),
+        data.vertex.data(),
         GL_STATIC_DRAW);
 
     GLuint indId;
@@ -155,30 +179,30 @@ Mesh *Mesh::load(
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indId);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        sizeof(GLushort) * triangle.size(),
-        triangle.data(),
+        sizeof(GLushort) * data.triangle.size(),
+        data.triangle.data(),
         GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     GLuint nbId = 0;
-    if(has_normal) {
+    if(!data.normal.empty()) {
         glGenBuffers(1, &nbId);
         glBindBuffer(GL_ARRAY_BUFFER, nbId);
         glBufferData(
             GL_ARRAY_BUFFER,
-            sizeof(glm::vec3) * normal.size(),
-            normal.data(),
+            sizeof(glm::vec3) * data.normal.size(),
+            data.normal.data(),
             GL_STATIC_DRAW);
     }
 
     GLuint uvId = 0;
-    if(has_uv) {
+    if(!data.uv.empty()) {
         glGenBuffers(1, &uvId);
         glBindBuffer(GL_ARRAY_BUFFER, uvId);
         glBufferData(
             GL_ARRAY_BUFFER,
-            sizeof(glm::vec2) * uv.size(),
-            uv.data(),
+            sizeof(glm::vec2) * data.uv.size(),
+            data.uv.data(),
             GL_STATIC_DRAW);
     }
 
@@ -191,17 +215,19 @@ Mesh *Mesh::load(
         nbId,
         uvId,
         0,
-        vertex.size(),
-        triangle.size()
+        data.vertex.size(),
+        data.triangle.size(),
+        submeshes
         );
+
     Resources::getInstance().registerResource(res);
     return res;
 }
 
-Mesh::Mesh(const string& name, GLuint vertexid, GLuint elementid, GLuint normalid, GLuint uvid, GLuint colorid, int vertices, int faces)
+Mesh::Mesh(const string& name, GLuint vertexid, GLuint elementid, GLuint normalid, GLuint uvid, GLuint colorid, int vertices, int faces, const std::unordered_map<string, MeshSlice> &submeshes)
     : Resource(name, MESH),
       m_vertex(vertexid), m_element(elementid), m_normal(normalid), m_uv(uvid),
-      m_color(colorid), m_vertices(vertices), m_faces(faces)
+      m_color(colorid), m_vertices(vertices), m_faces(faces), m_meshes(submeshes)
 {
 }
 

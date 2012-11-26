@@ -12,7 +12,8 @@ Model *Model::make(
     const string& name,
     Mesh *mesh,
     Program *program,
-    SamplerTextures textures
+    SamplerTextures textures,
+    bool blend
     )
 {
     // Create the vertex array object
@@ -61,11 +62,13 @@ Model *Model::make(
 
     Model *res = new Model(
         name,
+        mesh,
         vao,
         program->id(),
         mvpid,
-        mesh->faceCount(),
-        utextures);
+        utextures,
+        blend
+        );
 
     Resources::getInstance().registerResource(res);
     res->addDependency(mesh);
@@ -76,9 +79,9 @@ Model *Model::make(
     return res;
 }
 
-Model::Model(const string& name, GLuint id, GLuint shader, GLuint mvp, GLsizei faces, const UniformTextures &textures)
+Model::Model(const string& name, const Mesh *mesh, GLuint id, GLuint shader, GLuint mvp, const UniformTextures &textures, bool blend)
     : Resource(name, MODEL), m_id(id), m_shader_id(shader),
-      m_mvp_id(mvp), m_faces(faces), m_textures(textures)
+      m_mvp_id(mvp), m_textures(textures), m_blend(blend), m_mesh(mesh)
 {
 }
 
@@ -87,7 +90,7 @@ Model::~Model()
     glDeleteVertexArrays(1, &m_id);
 }
 
-void Model::render(const glm::mat4 &transform) const
+void Model::prepareRender() const
 {
     // Bind our vertex data
     glBindVertexArray(m_id);
@@ -95,21 +98,45 @@ void Model::render(const glm::mat4 &transform) const
     // Set shader program
     glUseProgram(m_shader_id);
 
-    // Set uniforms
-    glUniformMatrix4fv(m_mvp_id, 1, GL_FALSE, &transform[0][0]);
-
     // Set textures (if any)
     int texi = 0;
     for(const UniformTexture &t : m_textures) {
         glActiveTexture(GL_TEXTURE0 + texi);
         glBindTexture(t.second->target(), t.second->id());
         glUniform1i(t.first, texi);
-
         ++texi;
     }
- 
-    // Draw
-    glDrawElements(GL_TRIANGLES, m_faces, GL_UNSIGNED_SHORT, 0);
+
+    // Blending
+    if(m_blend) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+}
+
+void Model::endRender() const
+{
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glDisable(GL_BLEND);
+}
+
+void Model::render(const glm::mat4 &transform) const
+{
+    glUniformMatrix4fv(m_mvp_id, 1, GL_FALSE, &transform[0][0]);
+    glDrawElements(GL_TRIANGLES, m_mesh->faceCount(), GL_UNSIGNED_SHORT, 0);
+}
+
+void Model::render(const glm::mat4 &transform, const string &name) const
+{
+    MeshSlice offset = m_mesh->submeshOffset(name);
+    render(transform, offset.first, offset.second);
+}
+
+void Model::render(const glm::mat4 &transform, GLushort offset, GLsizei len) const
+{
+    glUniformMatrix4fv(m_mvp_id, 1, GL_FALSE, &transform[0][0]);
+    glDrawElements(GL_TRIANGLES, len, GL_UNSIGNED_SHORT, reinterpret_cast<GLvoid*>(sizeof(GLushort) * offset));
 }
 
 }

@@ -5,6 +5,10 @@ title: Luola 2.0
 fonts:
     default: core.font.default
 
+# Shared models
+models:
+    projectiles: projectile.model
+
 # Ship component descriptions
 ship:
     hulls: ship/hulls.yaml

@@ -134,6 +134,10 @@ namespace {
         string title = gameconf.opt("title", conftree::Node("Luola 2.0")).value();
         glfwSetWindowTitle(title.c_str());
 
+        // Models
+        conftree::Node models = gameconf.at("models");
+        Projectiles::setModel(models.at("projectiles").value());
+
         // Load ship components
         conftree::Node ship = gameconf.at("ship");
         ShipDefs::loadAll(df, ship.at("hulls").value());

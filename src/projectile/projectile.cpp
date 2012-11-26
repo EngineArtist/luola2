@@ -11,7 +11,7 @@ Projectile::Projectile(const ProjectileDef *def, const glm::vec2 &pos, const glm
 
 void Projectile::draw(const glm::mat4 &transform) const
 {
-    glm::mat4 m = glm::translate(transform, glm::vec3(m_physics.position(), 0.0f));
+    glm::mat4 m = glm::scale(glm::translate(transform, glm::vec3(m_physics.position(), 0.0f)), glm::vec3(m_def->radius()));
 
-    m_def->model()->render(m);
+    Projectiles::getModel()->render(m, m_def->mesh().first, m_def->mesh().second);
 }

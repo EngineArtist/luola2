@@ -3,8 +3,10 @@
 #include "world.h"
 #include "renderer.h"
 #include "res/font.h"
+#include "res/model.h"
 
 #include "ship/ship.h"
+#include "projectile/projectiledef.h"
 
 Renderer::Renderer(const World &world)
     : m_world(world)
@@ -37,8 +39,10 @@ void Renderer::render(double frametime) const
     for(const Ship &ship : m_world.m_ships)
         ship.draw(PV);
 
+    Projectiles::getModel()->prepareRender();
     for(const Projectile &p : m_world.m_projectiles)
         p.draw(PV);
+    Projectiles::getModel()->endRender();
 
     m_font->text("FPS: %.1f", 1.0 / frametime)
     .scale(0.5).pos(1,1).align(resource::TextRenderer::RIGHT).color(1,1,0)

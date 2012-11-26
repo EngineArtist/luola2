@@ -7,6 +7,7 @@
 using std::string;
 
 #include "projectile.h"
+#include "../res/mesh.h"
 
 namespace conftree { class Node; }
 namespace resource { class Model; }
@@ -37,11 +38,11 @@ public:
     float radius() const { return m_radius; }
 
     /**
-     * Get the model for rendering this projectile
+     * Get the submesh of the projectile model to use for rendering
      *
-     * @return model
+     * @return mesh slice
      */
-    const resource::Model *model() const { return m_model; }
+    resource::MeshSlice mesh() const { return m_mesh; }
 
     /**
      * Create projectile
@@ -55,7 +56,7 @@ private:
     float m_mass;
     float m_radius;
 
-    resource::Model *m_model;
+    resource::MeshSlice m_mesh;
 };
 
 class ProjectileFactoryBase
@@ -89,6 +90,22 @@ public:
      */
     static const ProjectileDef *get(const string &name);
 
+    /**
+     * Get the shared Model to use for rendering projectiles.
+     * 
+     * @return model instance
+     */
+    static const resource::Model *getModel();
+
+    /**
+     * Set the model to use for rendering projectiles.
+     *
+     * Note. The model resource must have already been loaded at this point.
+     *
+     * @param name model resource name
+     */
+    static void setModel(const string &name);
+ 
     static Projectiles &getInstance();
 
     void registerFactory(const string &name, ProjectileFactoryBase *factory);
@@ -96,6 +113,8 @@ public:
 private:
     std::unordered_map<string, ProjectileDef*> m_projectiles;
     std::unordered_map<string, ProjectileFactoryBase*> m_factories;
+
+    const resource::Model *m_model;
 };
 
 template<class W>

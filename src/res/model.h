@@ -44,22 +44,69 @@ public:
         const string& name,
         Mesh *mesh,
         Program *program,
-        SamplerTextures textures
+        SamplerTextures textures,
+        bool blend
         );
 
     Model() = delete;
     ~Model();
 
+    /**
+     * Get the Mesh of this model.
+     *
+     * @return mesh
+     */
+    const Mesh *mesh() const { return m_mesh; }
+
+    /**
+     * Bind vertex arrays, textures and the shader program.
+     *
+     * After this call, render() can be called repeatedly to render this model.
+     */
+    void prepareRender() const;
+
+    /**
+     * Render the entire mesh.
+     *
+     * Use this when rendering a mesh with no submeshes.
+     *
+     * @param transform the transformation to apply
+     */
     void render(const glm::mat4 &transform) const;
 
+    /**
+     * Render the named submesh.
+     *
+     * @param transform the transformation to apply
+     * @param name the name of the submesh to render
+     */
+    void render(const glm::mat4 &transform, const string &name) const;
+
+    /**
+     * Render the submesh.
+     *
+     * @param transform the transformation to apply
+     * @param offset vertex element array offset
+     * @param len number of vertex elements to draw
+     */
+    void render(const glm::mat4 &transform, GLushort offset, GLsizei len) const;
+
+    /**
+     * Clean up after rendering
+     */
+    void endRender() const;
+
 private:
-    Model(const string& name, GLuint m_id, GLuint shader, GLuint mvp, GLsizei faces, const UniformTextures &textures);
+    Model(const string& name, const Mesh *mesh, GLuint m_id, GLuint shader, GLuint mvp, const UniformTextures &textures, bool blend);
 
     GLuint m_id;
     GLuint m_shader_id;
     GLuint m_mvp_id;
-    GLsizei m_faces;
     UniformTextures m_textures;
+
+    bool m_blend;
+
+    const Mesh *m_mesh;
 };
 
 }

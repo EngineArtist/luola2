@@ -1,20 +1,21 @@
 autoload:
-    - projectile.blastingbolt.model
+    - projectile.model
 ---
 
-projectile.blastingbolt.model:
+projectile.model:
     type: model
-    mesh: projectile.blastingbolt.mesh
+    blend: true
+    mesh: projectile.mesh
     shader: projectile.shader
     textures:
         - sampler: myTextureSampler
-          texture: projectile.blastingbolt.texture
+          texture: projectile.texture
 
-projectile.blastingbolt.mesh:
+projectile.mesh:
     type: mesh
     src: projectile/test.mesh
 
-projectile.blastingbolt.texture:
+projectile.texture:
     type: texture
     src: projectile/test.png
 

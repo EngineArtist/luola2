@@ -24,6 +24,7 @@
 #include "world.h"
 #include "ship/ship.h"
 #include "terrain/terrains.h"
+#include "level/levels.h"
 
 namespace gameinit {
 
@@ -85,6 +86,9 @@ Hotseat Hotseat::loadFromFile(const string &filename)
             hs.addShip(parseShipConf(i, node.at(nodename)));
     }
 
+    // Level
+    hs.setLevel(node.at("level").value());
+
     return hs;
 }
 
@@ -93,31 +97,10 @@ void Hotseat::addShip(const ShipConf &shipconf)
     m_ships.push_back(shipconf);
 }
 
-namespace {
-terrain::Solid *makeTerrain()
-{
-    using namespace terrain;
-    std::vector<ConvexPolygon> polys;
-    std::vector<Point> points;
-    #if 1
-    for(int i=0;i<6;++i) {
-        points.push_back(Point(cos(i/6.0 * M_PI * 2) * 3, sin(i/6.0 * M_PI * 2) * 3));
-    }
-    #else
-    points.push_back(Point(-2, 1.2));
-    points.push_back(Point(-2, -1.2));
-    points.push_back(Point(3, -0));
-    #endif
-    polys.push_back(points);
-
-    return new terrain::Solid(polys);
-}
-}
-
 void Hotseat::initialize(World &world) const
 {
-    // Load level (TODO)
-    world.addSolid(makeTerrain());
+    // Load level
+    level::LevelRegistry::get(m_level).load(world);
 
     // Add ships
     for(const ShipConf &sc : m_ships) {

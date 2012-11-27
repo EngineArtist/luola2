@@ -48,6 +48,8 @@ struct ZoneProps {
  */
 class Zone : public Terrain {
 public:
+    Zone(const std::vector<ConvexPolygon> polygons) : Terrain(polygons) { }
+ 
     /**
      * Apply this zone to the given ZoneInfo object.
      *
@@ -55,6 +57,16 @@ public:
      */
     void apply(ZoneProps &z) const;
 
+    /**
+     * Set the zone vector
+     */
+    void setZoneForce(const glm::vec2 &force) { m_force = force; }
+
+    /**
+     * Set zone air density
+     */
+    void setZoneDensity(float density) { m_density = density; }
+ 
 private:
     glm::vec2 m_force;
     Optional<float> m_density;

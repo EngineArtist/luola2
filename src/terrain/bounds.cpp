@@ -25,6 +25,13 @@ BRect::BRect(const glm::vec2 &btmleft, const glm::vec2 &topright)
     assert(height() >= 0);
 }
 
+BRect::BRect(float x0, float y0, float w, float h)
+: m_btmleft(x0, y0), m_topright(x0+w, y0+h)
+{
+    assert(width() >= 0);
+    assert(height() >= 0);
+}
+
 BRect::BRect(const std::vector<glm::vec2> &points)
 {
     float x0=points[0].x, y0=points[0].y;

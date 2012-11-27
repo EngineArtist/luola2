@@ -40,6 +40,16 @@ public:
     BRect(const Point &btmleft, const Point &topright);
 
     /**
+     * Construct a bounding rectangle from origin point and size.
+     *
+     * @param x0 X coordinate of left border
+     * @param y0 Y coordinate of bottom border
+     * @param w rectangle width
+     * @param h rectangle height
+     */
+    BRect(float x0, float y0, float w, float h);
+
+    /**
      * Construct a bounding rectangle that encompasses the given list of points.
      *
      * @param points list of points

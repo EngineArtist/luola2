@@ -19,10 +19,8 @@
 
 #include "paths.h"
 
+namespace bfs = boost::filesystem;
 namespace fs {
-
-using boost::filesystem::path;
-using std::string;
 
 namespace {
     //! Paths singleton
@@ -46,10 +44,10 @@ namespace {
     /**
      * Check if path exists and is a directory
      */
-    bool isDirectory(const path &path)
+    bool isDirectory(const bfs::path &path)
     {
-        return boost::filesystem::exists(path) &&
-            boost::filesystem::is_directory(path);
+        return bfs::exists(path) &&
+            bfs::is_directory(path);
     }
 }
 
@@ -66,7 +64,7 @@ bool Paths::init(const string& extradata)
     PathVector datapaths = platformDataPaths();
 
     if(!extradata.empty()) {
-        path ed(extradata);
+        bfs::path ed(extradata);
         if(boost::filesystem::exists(ed) && boost::filesystem::is_directory(ed))
             datapaths.insert(datapaths.begin(), ed);
         else
@@ -80,7 +78,7 @@ bool Paths::init(const string& extradata)
 
 #ifndef NDEBUG
     std::cout << "Found data directories:\n";
-    for(const path &p : datapaths)
+    for(const bfs::path &p : datapaths)
         std::cout << "\t" << p << "\n";
 #endif
 
@@ -94,14 +92,27 @@ const Paths &Paths::get() {
     return *PATHS;
 }
 
-path Paths::findDataFile(const string& filename) const
+bfs::path Paths::findDataFile(const string& filename) const
 {
-    for(const path& dp : m_datapaths) {
-        path p = dp / filename;
-        if(boost::filesystem::exists(p))
+    for(const bfs::path& dp : m_datapaths) {
+        bfs::path p = dp / filename;
+        if(bfs::exists(p))
             return p;
     }
-    return path();
+    return bfs::path();
+}
+
+std::unordered_set<string> Paths::dataglob(const string &pattern) const
+{
+    std::unordered_set<string> files;
+    for(const auto &path : datapaths()) {
+        for(bfs::directory_iterator i(path);i!=bfs::directory_iterator();++i) {
+            string filename = i->path().filename().string();
+            if(boost::algorithm::ends_with(filename, pattern))
+                files.insert(filename);
+        }
+    }
+    return files;
 }
 
 }

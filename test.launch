@@ -1,5 +1,7 @@
 # Sample quicklaunch file
 
+level: test
+
 player1:
     team: 1
     hull: test
@@ -10,4 +12,4 @@ player1:
     weapon1:
         weapon: railgun
         ammo: blastingbolt
-    position: [0, 3]
+    position: [5, 3]

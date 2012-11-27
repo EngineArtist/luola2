@@ -29,16 +29,20 @@ namespace {
         glm::vec2 dvel;
     };
 
-    glm::vec2 acceleration(const glm::vec2 &vel, float drag, float mass)
+    glm::vec2 acceleration(const terrain::ZoneProps &zone, const glm::vec2 &vel, float drag, float mass)
     {
-        // Gravity + air resistance
+        // Zone force (typically just gravity)
+        glm::vec2 a = zone.force;
+
+        // Air resistance
+        if(vel.x + vel.y != 0.0)
+            a -= glm::normalize(vel) * drag * glm::dot(vel, vel) * mass;
+
         // TODO + lift + gravity anomalies
-        return glm::vec2(0, -9.81)
-            - (glm::normalize(vel) * drag * glm::dot(vel, vel) * mass)
-            ;
+        return a;
     }
 
-    Derivate evaluate(const Physical &obj, float dt, const Derivate &d)
+    Derivate evaluate(const terrain::ZoneProps &zone, const Physical &obj, float dt, const Derivate &d)
     {
         glm::vec2 vel = obj.velocity() + d.dvel * dt;
 
@@ -48,7 +52,7 @@ namespace {
 
         Derivate out;
         out.dpos = vel;
-        out.dvel = acceleration(vel, drag, obj.mass());
+        out.dvel = acceleration(zone, vel, drag, obj.mass());
 
        return out;
     }
@@ -70,11 +74,14 @@ void Physical::step(const World &world)
     m_vel += m_imp * imass();
     m_imp = glm::vec2();
 
+    // Get current zone
+    terrain::ZoneProps zone = world.zoneAt(m_pos);
+
     // Integrate forces (RK4)
-    Derivate a = evaluate(*this, 0.0f, Derivate());
-    Derivate b = evaluate(*this, TIMESTEP*0.5f, a);
-    Derivate c = evaluate(*this, TIMESTEP*0.5f, b);
-    Derivate d = evaluate(*this, TIMESTEP, c);
+    Derivate a = evaluate(zone, *this, 0.0f, Derivate());
+    Derivate b = evaluate(zone, *this, TIMESTEP*0.5f, a);
+    Derivate c = evaluate(zone, *this, TIMESTEP*0.5f, b);
+    Derivate d = evaluate(zone, *this, TIMESTEP, c);
 
     const glm::vec2 dposdt = 1.0f/6.0f * (a.dpos + 2.0f*(b.dpos + c.dpos) + d.dpos);
     const glm::vec2 dveldt = 1.0f/6.0f * (a.dvel + 2.0f*(b.dvel + c.dvel) + d.dvel);
@@ -90,12 +97,29 @@ void Physical::step(const World &world)
         // Collision detected!
         std::cerr << "terrain collision (" << m_pos.x << "," << m_pos.y << ") detected at " << cp.x << ", " << cp.y << " [" << cnorm.x << "," << cnorm.y << "]" << std::endl;
         m_pos = cp;
-        m_vel = glm::vec2(0, 0.01);
+        m_vel = glm::vec2(0);
         //m_vel = glm::reflect(m_vel, cnorm);
 
     } else {
-        // No collisions, apply position step normally
+        // No collisions, apply position step normally.
         m_pos += dposdt * TIMESTEP;
+
+        // Make sure the object stays withing the world bounds
+        if(m_pos.x < world.bounds().left()) {
+            m_pos.x = world.bounds().left() + 0.001;
+            m_vel.x = 0;
+        } else if(m_pos.x > world.bounds().right()) {
+            m_pos.x = world.bounds().right() - 0.001;
+            m_vel.x = 0;
+        }
+
+        if(m_pos.y < world.bounds().bottom()) {
+            m_pos.y = world.bounds().bottom() + 0.001;
+            m_vel.y = 0;
+        } else if(m_pos.y > world.bounds().top()) {
+            m_pos.y = world.bounds().top() - 0.001;
+            m_vel.y = 0;
+        }
     }
 }
 

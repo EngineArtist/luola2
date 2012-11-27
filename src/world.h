@@ -36,6 +36,16 @@ public:
     //// Querying
 
     /**
+     * Get the ship owned by the given player.
+     *
+     * This may return null if the player isn't in play
+     * or the ship has been destroyed.
+     *
+     * @return player ship or nullptr
+     */
+    Ship *getPlayerShip(int player);
+
+    /**
      * Get the zone properties at the given point.
      *
      * @param p point in level space
@@ -72,8 +82,26 @@ public:
      */
     void addProjectile(const Projectile &projectile);
 
-    // TODO
-    Ship *getPlayerShip(int player);
+    /**
+     * Set root zone properties
+     *
+     * @param props zone properties
+     */
+    void setRootZone(const terrain::ZoneProps &props) { m_rootzone = props; }
+
+    /**
+     * Set world boundaries
+     *
+     * @param bounds boundaries
+     */
+    void setBounds(const terrain::BRect &bounds) { m_bounds = bounds; }
+
+    /**
+     * Get world boundaries
+     *
+     * @return boundaries
+     */
+    const terrain::BRect &bounds() const { return m_bounds; }
 
     /**
      * Add a new zone to the world.
@@ -116,6 +144,7 @@ private:
 
     // Root zone properties
     terrain::ZoneProps m_rootzone;
+    terrain::BRect m_bounds;
 
     // Flythrough zones
     std::vector<terrain::Zone*> m_zones;

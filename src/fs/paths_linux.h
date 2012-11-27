@@ -38,7 +38,7 @@ namespace {
 
         // Find our data directories
         for(const string& dir : datadirs) {
-            path p = path(dir) / "luola2";
+			bfs::path p = bfs::path(dir) / "luola2";
             if(isDirectory(p))
                 pv.push_back(p);
         }

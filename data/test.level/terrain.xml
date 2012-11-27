@@ -1,0 +1,15 @@
+<level bounds="0 0 10 10">
+	<zones>
+		<root force="0 -9.81"/>
+	</zones>
+	<static>
+		<block>
+			<polygon>1 1 5 1 5 5 1 5</polygon>
+		</block>
+	</static>
+	<solid>
+		<block>
+			<polygon>2.5 6 5 6 3 8</polygon>
+		</block>
+	</solid>
+</level>

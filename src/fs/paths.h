@@ -19,6 +19,9 @@
 
 #include <boost/filesystem.hpp>
 #include <vector>
+#include <unordered_set>
+
+using std::string;
 
 namespace fs {
 
@@ -37,7 +40,7 @@ public:
      * @param extradata 
      * @return true if all required paths were found
      */
-    static bool init(const std::string& extradata);
+    static bool init(const string& extradata);
 
     /**
      * Get the Paths singleton.
@@ -58,11 +61,18 @@ public:
     const PathVector& datapaths() const { return m_datapaths; }
 
     /**
+     * Find all files from all data directories that end with the given pattern.
+     * 
+     * @param pattern the string matched filenames must end with (e.g. ".level")
+     */
+    std::unordered_set<string> dataglob(const string &pattern) const;
+
+    /**
      * Search the data directories for a file.
      * 
      * @return full path of file or invalid path if not found.
      */
-    boost::filesystem::path findDataFile(const std::string& filename) const;
+    boost::filesystem::path findDataFile(const string& filename) const;
 
 private:
     Paths(const PathVector &datapaths);

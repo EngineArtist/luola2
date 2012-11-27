@@ -94,8 +94,16 @@ public:
      */
     void addShip(const ShipConf &shipconf);
 
+    /**
+     * Set the level to play on
+     *
+     * @param level level name
+     */
+    void setLevel(const string &level) { m_level = level; }
+
 private:
     std::vector<ShipConf> m_ships;
+    string m_level;
 };
 
 class GameInitError : public std::exception {

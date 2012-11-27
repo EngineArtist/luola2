@@ -28,16 +28,6 @@ void World::step()
         m_ships[i].shipStep(*this);
         obj.step(*this);
 
-        // Boundary collisions
-        glm::vec2 vel = obj.velocity();
-
-        if(obj.position().x<-10 || obj.position().x>10)
-            vel.x = -vel.x;
-        if(obj.position().y<-7.5 || obj.position().y>7.5)
-            vel.y = -vel.y;
-
-        obj.setVelocity(vel);
-
         // Object-object collisions
         for(unsigned int j=i+1;j<m_ships.size();++j) {
             if(obj.checkCollision(m_ships[j].physics())) {
@@ -51,16 +41,6 @@ void World::step()
         Physical &obj = m_projectiles[i].physics();
 
         obj.step(*this);
-
-        // Boundary collisions
-        glm::vec2 vel = obj.velocity();
-
-        if(obj.position().x<-10 || obj.position().x>10)
-            vel.x = -vel.x;
-        if(obj.position().y<-7.5 || obj.position().y>7.5)
-            vel.y = -vel.y;
-
-        obj.setVelocity(vel);
     }
 }
 

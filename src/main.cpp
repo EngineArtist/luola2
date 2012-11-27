@@ -35,6 +35,7 @@
 #include "equipment/equipment.h"
 #include "weapon/weapon.h"
 #include "projectile/projectiledef.h"
+#include "level/levels.h"
 
 #include "game.h"
 
@@ -185,6 +186,8 @@ int main(int argc, char **argv) {
 
         if(!loadGame(args.gamefile))
             return 1;
+
+		level::LevelRegistry::init();
 
         if(args.launchfile.length() == 0) {
             cerr << "Game menu system not yet implemented! Use --launch <file> to start the game!\n";

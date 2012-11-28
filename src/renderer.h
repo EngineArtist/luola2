@@ -17,6 +17,9 @@
 #ifndef LUOLA_RENDERER_H
 #define LUOLA_RENDERER_H
 
+#include <glm/glm.hpp>
+#include "terrain/common.h"
+
 class World;
 namespace resource { class Font; }
 
@@ -24,10 +27,36 @@ class Renderer {
 public:
     Renderer(const World &world);
 
+    /**
+     * Center the given point in the viewport.
+     *
+     * The viewport position is clamped so it never
+     * goes outside the world bounds.
+     *
+     * @param point new viewpoint center
+     */
+    void setCenter(const terrain::Point &point);
+
+    /**
+     * Set the zoom factor.
+     *
+     * The zoom factor determines how many units will fit in the viewport.
+     *
+     * @param zoon zoom factor
+     */
+    void setZoom(float zoom);
+
     void render(double frametime) const;
 
 private:
+    void updateProjection();
+
     const World &m_world;
+
+    terrain::Point m_center;
+    float m_zoom;
+    glm::mat4 m_projection;
+
     resource::Font *m_font;
 };
 

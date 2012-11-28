@@ -38,23 +38,6 @@
 #include "equipment/equipment.h"
 #include "renderer.h"
 
-terrain::ConvexPolygon makeNibblePolygon(float x, float y)
-{
-    using namespace terrain;
-    std::vector<Point> points;
-#if 1
-    for(int i=0;i<6;++i) {
-        points.push_back(Point(cos(i/6.0 * M_PI * 2) * 0.5 + x, sin(i/6.0 * M_PI * 2) * 0.5 + y));
-    }
-#else
-    points.push_back(Point(x-0.5, y+1));
-    points.push_back(Point(x-0.5, y-1));
-    points.push_back(Point(x+0.5, y-1));
-    points.push_back(Point(x+0.5, y+1));
-#endif
-    return ConvexPolygon(points);
-}
-
 void gameloop(const gameinit::Hotseat &init)
 {
     glfwEnable( GLFW_STICKY_KEYS );
@@ -63,6 +46,8 @@ void gameloop(const gameinit::Hotseat &init)
     World world;
     Renderer renderer(world);
 
+    renderer.setZoom(15);
+
     init.initialize(world);
 
     input::initPlayerInputs();
@@ -70,7 +55,6 @@ void gameloop(const gameinit::Hotseat &init)
     double time_now = glfwGetTime();
     double time_accumulator = 0.0;
 
-    bool mousedown = false;
     do {
         double new_time = glfwGetTime();
         double frame_time = new_time - time_now;
@@ -107,22 +91,8 @@ void gameloop(const gameinit::Hotseat &init)
             time_accumulator -= Physical::TIMESTEP;
         }
 
-        // Testing... To be removed.
-        if(glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
-            if(!mousedown) {
-                mousedown = true;
-                int mx, my;
-                glfwGetMousePos(&mx, &my);
-                float x, y;
-                x = (mx - 400) / 400.0 * 10;
-                y = -(my - 300) / 300.0 * 7.5;
-                std::cout << "mouse " << mx << ", " << my << " --> " << x << ", " << y << std::endl;
-                world.makeHole(makeNibblePolygon(x, y));
-            }
-        } else
-            mousedown = false;
-
         // Graphics
+        renderer.setCenter(world.getPlayerShip(1)->physics().position());
         renderer.render(frame_time);
     } while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
 

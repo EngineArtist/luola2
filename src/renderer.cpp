@@ -30,34 +30,45 @@ Renderer::Renderer(const World &world)
     m_font = resource::get<resource::Font>("core.font.default");
 }
 
+void Renderer::setCenter(const terrain::Point &point)
+{
+    m_center = point;
+    updateProjection();
+}
+
+void Renderer::setZoom(float zoom)
+{
+    assert(zoom > 0.0f);
+    m_zoom = zoom;
+    updateProjection();
+}
+
+void Renderer::updateProjection()
+{
+    glm::mat4 proj = glm::ortho(-m_zoom, m_zoom, -m_zoom, m_zoom);
+    // TODO prevent viewport from going outside world bounds
+    m_projection = glm::translate(proj, -glm::vec3(m_center, 0));
+}
+
 void Renderer::render(double frametime) const
 {
     glClear( GL_COLOR_BUFFER_BIT );
 
-    glm::mat4 proj = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-
-    glm::mat4 view = glm::lookAt(
-        glm::vec3(0,0,20),
-                                 glm::vec3(0,0,0),
-                                 glm::vec3(0,1,0)
-    );
-
-    glm::mat4 PV = proj * view; 
     for(const terrain::Zone *zone : m_world.m_zones)
-        zone->draw(PV);
+        zone->draw(m_projection);
 
     for(const terrain::Solid *solid : m_world.m_static_terrain)
-        solid->draw(PV);
+        solid->draw(m_projection);
 
     for(const terrain::Solid *solid : m_world.m_dyn_terrain)
-        solid->draw(PV);
+        solid->draw(m_projection);
 
     for(const Ship &ship : m_world.m_ships)
-        ship.draw(PV);
+        ship.draw(m_projection);
 
     Projectiles::getModel()->prepareRender();
     for(const Projectile &p : m_world.m_projectiles)
-        p.draw(PV);
+        p.draw(m_projection);
     Projectiles::getModel()->endRender();
 
     m_font->text("FPS: %.1f", 1.0 / frametime)

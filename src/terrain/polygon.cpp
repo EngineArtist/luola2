@@ -58,9 +58,6 @@ void ConvexPolygon::make(const Points &points, std::vector<ConvexPolygon> &polys
 
 bool ConvexPolygon::circleCollision(const Point &p, float r, const glm::vec2 &v, Point &cp, glm::vec2 &normal) const
 {
-    // constant: how much an object is repositioned off the point of contact
-    static const float SMIDGEN = 0.001f;
-
     for(int i=0;i<vertexCount();++i) {
         // Check if the circle is moving away from the edge
         const glm::vec2 &n = m_normals[i];
@@ -79,7 +76,7 @@ bool ConvexPolygon::circleCollision(const Point &p, float r, const glm::vec2 &v,
         Point icp;
         if(algorithm::lineIntersection(e0, vertex(i+1), lp0, lp1, icp)) {
             // Intersection!
-            cp = icp + lead + (n * SMIDGEN);
+            cp = icp + lead;
             normal = n;
             return true;
         }
@@ -95,7 +92,7 @@ bool ConvexPolygon::circleCollision(const Point &p, float r, const glm::vec2 &v,
         if(root >= 0) {
             float t = (-b - glm::sqrt(root)) / a;
             if(t >= 0 && t <= 1) {
-                cp = p - v * t - (n * SMIDGEN);
+                cp = p - v * t;
                 normal = n;
                 return true;
             }
@@ -430,7 +427,7 @@ void ConvexPolygon::toTriangles(Points &points) const
         points.push_back(m_points[i]);
 
         // normal
-#if 1
+#if 0
         Point halfp = (m_points[i] - m_points[i-1]) * Point(0.5, 0.5);
         Point np = m_points[i-1] + halfp;
         points.push_back(np);
@@ -440,7 +437,7 @@ void ConvexPolygon::toTriangles(Points &points) const
     points.push_back(m_points.back());
     points.push_back(m_points[0]);
 
-#if 1
+#if 0
     Point halfp = (m_points.back() - m_points[0]) * Point(0.5, 0.5);
     Point np = m_points[0] + halfp;
     points.push_back(np);

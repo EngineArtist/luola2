@@ -17,6 +17,7 @@
 //
 #include <iostream>
 #include <GL/glew.h>
+#include <glm/gtx/norm.hpp>
 
 #include "terrain.h"
 #include "../res/shader.h"
@@ -52,11 +53,21 @@ bool Terrain::hasPoint(const Point &p) const
 
 bool Terrain::circleCollision(const Point &p, float r, const glm::vec2 &v, Point &cp, glm::vec2 &normal) const
 {
+    float nearest = 9999.0f;
+
+    Point colp;
+    glm::vec2 colnormal;
     for(const ConvexPolygon &poly : m_polygons) {
-        if(poly.circleCollision(p, r, v, cp, normal))
-            return true;
+        if(poly.circleCollision(p, r, v, colp, colnormal)) {
+            float dist = glm::distance2(colp, p);
+            if(dist < nearest) {
+                nearest = dist;
+                cp = colp;
+                normal = colnormal;
+            }
+        }
     }
-    return false;
+    return nearest < 9999.0f;
 }
 
 bool Terrain::nibble(const ConvexPolygon &hole)

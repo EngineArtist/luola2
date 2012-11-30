@@ -97,7 +97,7 @@ void Physical::step(const World &world)
     if(world.checkTerrainCollision(m_pos, m_radius, dpos, cp, cnorm)) {
         // Collision detected!
         std::cerr << "terrain collision (" << m_pos.x << "," << m_pos.y << ") detected at " << cp.x << ", " << cp.y << " [" << cnorm.x << "," << cnorm.y << "]" << std::endl;
-        m_pos = cp;
+        m_pos = cp + cnorm * 0.001f;
         m_vel = glm::vec2(0);
         //m_vel = glm::reflect(m_vel, cnorm);
 

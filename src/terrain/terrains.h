@@ -34,7 +34,10 @@ namespace terrain {
  * while some are cumulative (such as force vectors.)
  */
 struct ZoneProps {
-    /// The force vector in the zone. This is the gravity vector in the root zone
+    /// The gravity vector. This is set only in the root zone
+    glm::vec2 gravity;
+
+    /// Extra force in  the zone (wind, air current, etc.)
     glm::vec2 force;
 
     /// The medium density (0 for space)

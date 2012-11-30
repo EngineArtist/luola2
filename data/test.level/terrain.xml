@@ -1,6 +1,9 @@
-<level bounds="0 0 10 10">
+<level bounds="0 -5 30 35">
 	<zones>
-		<root force="0 -9.81"/>
+		<root gravity="0 -9.81" density="1.2" />
+		<block density="1000.0">
+			<polygon>0 -5 30 -5 30 0 0 0</polygon>
+		</block>
 	</zones>
 	<static>
 		<block>
@@ -10,6 +13,12 @@
 	<solid>
 		<block>
 			<polygon>2.5 6 5 6 3 8</polygon>
+		</block>
+		<block>
+			<polygon>4.5 11 7 11 5 13</polygon>
+		</block>
+		<block>
+			<polygon>4.5 16 7 16 5 18 4.5 17</polygon>
 		</block>
 	</solid>
 </level>

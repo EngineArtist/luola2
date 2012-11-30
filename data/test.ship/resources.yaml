@@ -9,7 +9,7 @@ ship.test.model:
 ship.test.mesh:
     type: mesh
     src: vwing.mesh
-    scale: 0.3
+    scale: 0.6
 
 ship.test.texture:
     type: texture

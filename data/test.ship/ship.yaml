@@ -1,8 +1,8 @@
 shortname: Test
 fullname: Test ship
 
-mass: 2.0
-radius: 0.2
+mass: 1000
+radius: 1.0
 turningrate: 180
 
 model: ship.test.model

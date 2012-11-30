@@ -2,4 +2,4 @@ railgun:
     codebase: launcher
     cooloff: 0.2
     energy: 4
-    force: 50
+    force: 800

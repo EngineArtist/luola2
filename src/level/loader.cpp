@@ -100,6 +100,11 @@ terrain::ZoneProps parseZoneProps(const XMLElement *zone)
         throw LevelException("force vector should contain two values!");
     props.force = glm::vec2(atof(forcev[0].c_str()), atof(forcev[1].c_str()));
 
+    forcev = split(Attr(zone, "gravity", "0 -9.8"));
+    if(forcev.size() != 2)
+        throw LevelException("gravity vector should contain two values!");
+    props.gravity = glm::vec2(atof(forcev[0].c_str()), atof(forcev[1].c_str()));
+
     if(zone->Attribute("density"))
         props.density = zone->FloatAttribute("density");
     else
@@ -125,6 +130,7 @@ void loadZoneBlock(const XMLElement *zone_el, World &world)
     terrain::Zone *zone = new terrain::Zone(parsePolygons(zone_el));
 
     zone->setZoneForce(props.force);
+
     if(props.density>=0)
         zone->setZoneDensity(props.density);
 

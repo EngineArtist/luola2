@@ -30,16 +30,24 @@ namespace {
         glm::vec2 dvel;
     };
 
-    glm::vec2 acceleration(const terrain::ZoneProps &zone, const glm::vec2 &vel, float drag, float mass)
+    glm::vec2 acceleration(const terrain::ZoneProps &zone, const glm::vec2 &vel, const Physical &obj)
     {
+        // Gravity
+        glm::vec2 g = zone.gravity;
+        // TODO gravity anomalies
+
         // Zone force (typically just gravity)
-        glm::vec2 a = zone.force;
+        glm::vec2 a = g + zone.force;
 
         // Air resistance
-        if(vel.x + vel.y != 0.0)
-            a -= glm::normalize(vel) * drag * glm::dot(vel, vel) * mass;
+        float v2 = glm::dot(vel, vel);
+        if(v2 > 0.00001f)
+            a -= glm::normalize(vel) * (0.5f * zone.density * v2 * 0.1f * obj.area() * obj.imass());
 
-        // TODO + lift + gravity anomalies
+        // Buoyancy
+        // This is a bit simplified. Partial immersion in a zone is not supported
+        a -= g * (zone.density * obj.area() * obj.imass());
+
         return a;
     }
 
@@ -47,26 +55,25 @@ namespace {
     {
         glm::vec2 vel = obj.velocity() + d.dvel * dt;
 
-        // Drag coefficient.
-        // TODO this depends on the object radius and the environment (i.e. water or air)
-        float drag = 0.1;
-
         Derivate out;
         out.dpos = vel;
-        out.dvel = acceleration(zone, vel, drag, obj.mass());
+        out.dvel = acceleration(zone, vel, obj);
 
        return out;
     }
 }
 
 Physical::Physical()
-    : m_mass(1.0f), m_radius(1.0f)
 {
+    setMass(1.0f);
+    setRadius(1.0f);
 }
 
 Physical::Physical(float mass, float radius, const glm::vec2 &pos, const glm::vec2 &vel)
-    : m_pos(pos), m_vel(vel), m_mass(mass), m_radius(radius)
+    : m_pos(pos), m_vel(vel)
 {
+    setMass(mass);
+    setRadius(radius);
 }
 
 void Physical::step(const World &world)
@@ -156,4 +163,16 @@ bool Physical::checkCollision(Physical &other)
     other.addImpulse(-impulse);
 
     return true;
+}
+
+void Physical::setMass(float mass)
+{
+    m_mass = mass;
+}
+
+void Physical::setRadius(float radius)
+{
+    assert(radius > 0);
+    m_radius = radius;
+    m_area = M_PI * radius *radius;
 }

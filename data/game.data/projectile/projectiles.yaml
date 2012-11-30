@@ -1,5 +1,5 @@
 blastingbolt:
     codebase: simplebullet
     mesh: 0
-    mass: 1
-    radius: 0.1
+    mass: 10
+    radius: 0.05

@@ -127,7 +127,7 @@ public:
      *
      * @param mass new mass
      */
-    void setMass(float mass) { m_mass = mass; }
+    void setMass(float mass);
 
     /**
      * Get the radius of the object.
@@ -146,7 +146,14 @@ public:
      *
      * @param radius object radius
      */
-    void setRadius(float radius) { assert(radius>0); m_radius = radius; }
+    void setRadius(float radius);
+
+    /**
+     * Get the area of the object
+     *
+     * @return area
+     */
+    float area() const { return m_area; }
 
     /**
      * Simulate a timestep.
@@ -174,6 +181,7 @@ private:
 
     float m_mass;
     float m_radius;
+    float m_area; // cached
 };
 
 #endif

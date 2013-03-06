@@ -89,6 +89,8 @@ public:
      */
     static const Level &get(const string &name);
 
+    static void add(const string &filename);
+
 private:
     /**
      * Load level metadata

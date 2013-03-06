@@ -156,6 +156,13 @@ namespace {
         conftree::Node models = gameconf.at("models");
         Projectiles::setModel(models.at("projectiles").value());
 
+        // Levels
+        conftree::Node levels = gameconf.at("levels");
+        for (int i = 0; i < levels.items(); ++i)
+        {
+            level::LevelRegistry::add(levels.at(i).value());
+        }
+
         // Load ship components
         conftree::Node ship = gameconf.at("ship");
         ShipDefs::loadAll(df, ship.at("hulls").value());

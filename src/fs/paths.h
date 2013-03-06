@@ -62,13 +62,6 @@ public:
     const PathVector& datapaths() const { return m_datapaths; }
 
     /**
-     * Find all files from all data directories that end with the given pattern.
-     * 
-     * @param pattern the string matched filenames must end with (e.g. ".level")
-     */
-    std::unordered_set<string> dataglob(const string &pattern) const;
-
-    /**
      * Search the data directories for a file.
      * 
      * @return full path of file or invalid path if not found.

@@ -103,17 +103,5 @@ bfs::path Paths::findDataFile(const string& filename) const
     return bfs::path();
 }
 
-std::unordered_set<string> Paths::dataglob(const string &pattern) const
-{
-    std::unordered_set<string> files;
-    for(const auto &path : datapaths()) {
-        for(bfs::directory_iterator i(path);i!=bfs::directory_iterator();++i) {
-            string filename = i->path().filename().string();
-            if(boost::algorithm::ends_with(filename, pattern))
-                files.insert(filename);
-        }
-    }
-    return files;
 }
 
-}

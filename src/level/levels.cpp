@@ -40,16 +40,16 @@ void LevelRegistry::init()
         delete LEVELS;
 
     LEVELS = new LevelRegistry();
-
-    // Scan level files
-    std::unordered_set<string> levelfiles = fs::Paths::get().dataglob(LEVELFILE_SUFFIX);
-    for(const string &level : levelfiles)
-        LEVELS->addLevel(level);
 }
 
 const Level &LevelRegistry::get(const string &name)
 {
     return LEVELS->m_levels.at(name);
+}
+
+void LevelRegistry::add(const string &filename)
+{
+    LEVELS->addLevel(filename);
 }
 
 void LevelRegistry::addLevel(const string &filename)

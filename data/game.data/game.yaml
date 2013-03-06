@@ -17,3 +17,6 @@ ship:
     equipment: ship/equipment.yaml
     weapons: ship/weapons.yaml
     projectiles: projectile/projectiles.yaml
+
+levels:
+    - test.level
